@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Real Estate AI — Business-in-a-Box</title>
+  <style>
+    :root {
+      --primary: #1e50a0;
+      --primary-dark: #163a78;
+      --accent: #f59e0b;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #1e293b;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --radius: 12px;
+      --shadow: 0 4px 24px rgba(30,80,160,0.08);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); }
+
+    /* Nav */
+    nav { background: var(--primary); color: #fff; padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 60px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+    .nav-brand { font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+    .nav-brand svg { width: 32px; height: 32px; }
+    .nav-links { display: flex; gap: 1.5rem; }
+    .nav-links a { color: rgba(255,255,255,0.85); text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
+    .nav-links a:hover { color: #fff; }
+    .demo-badge { background: var(--accent); color: #1e293b; font-size: 0.75rem; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
+
+    /* Hero */
+    .hero { background: linear-gradient(135deg, var(--primary) 0%, #2563eb 100%); color: #fff; padding: 5rem 2rem 4rem; text-align: center; }
+    .hero h1 { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; margin-bottom: 1rem; line-height: 1.15; }
+    .hero p { font-size: 1.2rem; opacity: 0.9; max-width: 600px; margin: 0 auto 2rem; }
+    .hero-cta { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 0.75rem 1.75rem; border-radius: 8px; font-weight: 600; font-size: 1rem; text-decoration: none; cursor: pointer; border: none; transition: all 0.2s; }
+    .btn-primary { background: var(--accent); color: #1e293b; }
+    .btn-primary:hover { background: #d97706; transform: translateY(-1px); }
+    .btn-outline { background: transparent; color: #fff; border: 2px solid rgba(255,255,255,0.6); }
+    .btn-outline:hover { border-color: #fff; background: rgba(255,255,255,0.1); }
+
+    /* Stats bar */
+    .stats-bar { background: var(--primary-dark); color: #fff; display: flex; justify-content: center; gap: 3rem; padding: 1.25rem 2rem; flex-wrap: wrap; }
+    .stat { text-align: center; }
+    .stat-num { font-size: 1.6rem; font-weight: 800; color: var(--accent); }
+    .stat-label { font-size: 0.8rem; opacity: 0.8; }
+
+    /* Tools grid */
+    .section { padding: 4rem 2rem; max-width: 1200px; margin: 0 auto; }
+    .section-title { font-size: 2rem; font-weight: 700; text-align: center; margin-bottom: 0.5rem; }
+    .section-sub { text-align: center; color: var(--muted); margin-bottom: 3rem; font-size: 1.05rem; }
+    .tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+    .tool-card { background: var(--card); border-radius: var(--radius); padding: 2rem; box-shadow: var(--shadow); border: 1px solid var(--border); transition: transform 0.2s, box-shadow 0.2s; text-decoration: none; color: inherit; display: block; }
+    .tool-card:hover { transform: translateY(-4px); box-shadow: 0 8px 32px rgba(30,80,160,0.14); }
+    .tool-icon { width: 52px; height: 52px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; margin-bottom: 1rem; }
+    .tool-card h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .tool-card p { color: var(--muted); font-size: 0.95rem; line-height: 1.5; margin-bottom: 1rem; }
+    .tool-tag { display: inline-block; background: #eff6ff; color: var(--primary); font-size: 0.75rem; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+
+    /* Features */
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
+    .feature { display: flex; gap: 1rem; align-items: flex-start; }
+    .feature-icon { font-size: 1.5rem; flex-shrink: 0; }
+    .feature h4 { font-weight: 600; margin-bottom: 0.25rem; }
+    .feature p { color: var(--muted); font-size: 0.9rem; }
+
+    /* Demo mode toggle */
+    .demo-banner { background: #fef3c7; border: 1px solid #fcd34d; border-radius: 8px; padding: 0.75rem 1.25rem; display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
+    .demo-banner p { font-size: 0.9rem; color: #92400e; flex: 1; }
+    .toggle { position: relative; display: inline-block; width: 44px; height: 24px; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; inset: 0; background: #cbd5e1; border-radius: 24px; transition: 0.3s; }
+    .slider:before { content: ''; position: absolute; height: 18px; width: 18px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.3s; }
+    input:checked + .slider { background: var(--primary); }
+    input:checked + .slider:before { transform: translateX(20px); }
+
+    /* Footer */
+    footer { background: var(--primary-dark); color: rgba(255,255,255,0.7); text-align: center; padding: 2rem; font-size: 0.9rem; }
+    footer a { color: var(--accent); text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">
+    <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="32" height="32" rx="8" fill="#f59e0b"/>
+      <path d="M16 6L4 14v14h8v-8h8v8h8V14L16 6z" fill="white"/>
+    </svg>
+    Real Estate AI
+  </div>
+  <div class="nav-links">
+    <a href="/tools/listing">Listing Writer</a>
+    <a href="/tools/cma">CMA Tool</a>
+    <a href="/tools/social">Social Posts</a>
+    <a href="/docs" target="_blank">API Docs</a>
+    <span class="demo-badge">DEMO MODE</span>
+  </div>
+</nav>
+
+<section class="hero">
+  <h1>AI-Powered Tools for<br>Real Estate Professionals</h1>
+  <p>Generate MLS listings, CMA reports, social posts, and email campaigns in seconds — not hours.</p>
+  <div class="hero-cta">
+    <a href="/tools/listing" class="btn btn-primary">🏡 Try Listing Writer</a>
+    <a href="/docs" class="btn btn-outline" target="_blank">📖 View API Docs</a>
+  </div>
+</section>
+
+<div class="stats-bar">
+  <div class="stat"><div class="stat-num">5</div><div class="stat-label">AI Tools</div></div>
+  <div class="stat"><div class="stat-num">30s</div><div class="stat-label">Avg Generation Time</div></div>
+  <div class="stat"><div class="stat-num">REST</div><div class="stat-label">API Ready</div></div>
+  <div class="stat"><div class="stat-num">100%</div><div class="stat-label">White-Label Ready</div></div>
+</div>
+
+<div class="section">
+  <div class="demo-banner">
+    <span>⚡</span>
+    <p><strong>Demo Mode Active</strong> — All tools work without an API key using built-in sample data. Add your <code>OPENAI_API_KEY</code> to enable live AI generation.</p>
+    <label class="toggle"><input type="checkbox" checked disabled><span class="slider"></span></label>
+  </div>
+
+  <h2 class="section-title">Your Complete Real Estate AI Toolkit</h2>
+  <p class="section-sub">Everything you need to automate your marketing and close more deals.</p>
+
+  <div class="tools-grid">
+    <a href="/tools/listing" class="tool-card">
+      <div class="tool-icon" style="background:#eff6ff;">🏡</div>
+      <h3>Listing Writer</h3>
+      <p>Generate compelling MLS descriptions in seconds. Choose your tone — luxury, family, investment, or casual — and get a polished listing ready to publish.</p>
+      <span class="tool-tag">POST /api/listing-writer</span>
+    </a>
+
+    <a href="/tools/cma" class="tool-card">
+      <div class="tool-icon" style="background:#f0fdf4;">📊</div>
+      <h3>CMA Assistant</h3>
+      <p>Input comparable sales and get an instant Comparative Market Analysis with estimated value, price range, and a downloadable PDF report.</p>
+      <span class="tool-tag">POST /api/cma</span>
+    </a>
+
+    <a href="/tools/social" class="tool-card">
+      <div class="tool-icon" style="background:#fdf4ff;">📱</div>
+      <h3>Social Generator</h3>
+      <p>Create platform-optimized posts for Instagram, Facebook, Twitter, and LinkedIn — complete with hashtags and calls to action.</p>
+      <span class="tool-tag">POST /api/social</span>
+    </a>
+
+    <div class="tool-card" style="cursor:default;">
+      <div class="tool-icon" style="background:#fff7ed;">✉️</div>
+      <h3>Email Campaigns</h3>
+      <p>Generate targeted email sequences for buyers, sellers, investors, and past clients. Multi-touch drip campaigns with personalization built in.</p>
+      <span class="tool-tag">POST /api/email</span>
+    </div>
+
+    <div class="tool-card" style="cursor:default;">
+      <div class="tool-icon" style="background:#fef2f2;">🚀</div>
+      <h3>Outreach Engine</h3>
+      <p>Build multi-step outreach sequences for new listings, price drops, open houses, and follow-ups. Preview the full sequence before sending.</p>
+      <span class="tool-tag">POST /api/outreach</span>
+    </div>
+
+    <a href="/docs" target="_blank" class="tool-card">
+      <div class="tool-icon" style="background:#f8fafc;">⚙️</div>
+      <h3>REST API</h3>
+      <p>Every tool is available via a clean REST API. Integrate with your CRM, website, or custom app. Full OpenAPI documentation included.</p>
+      <span class="tool-tag">OpenAPI / Swagger</span>
+    </a>
+  </div>
+</div>
+
+<div style="background:#f1f5f9; padding: 4rem 2rem;">
+  <div style="max-width:1200px; margin:0 auto;">
+    <h2 class="section-title">Built for Scale. Ready to Ship.</h2>
+    <p class="section-sub">Everything a buyer needs to launch and grow a real estate AI SaaS.</p>
+    <div class="features-grid">
+      <div class="feature"><span class="feature-icon">🔌</span><div><h4>Plug-in AI</h4><p>Works offline with demo data. Add OpenAI key to go live instantly.</p></div></div>
+      <div class="feature"><span class="feature-icon">📄</span><div><h4>PDF Reports</h4><p>CMA reports generated as professional PDFs, ready to send to clients.</p></div></div>
+      <div class="feature"><span class="feature-icon">🐳</span><div><h4>Docker Ready</h4><p>One command to deploy anywhere — Railway, Render, Fly.io, or your own VPS.</p></div></div>
+      <div class="feature"><span class="feature-icon">🔒</span><div><h4>API Key Auth</h4><p>Simple bearer token authentication. Add your own auth layer in minutes.</p></div></div>
+      <div class="feature"><span class="feature-icon">🧪</span><div><h4>Full Test Suite</h4><p>Pytest coverage for all AI modules. CI/CD pipeline included via GitHub Actions.</p></div></div>
+      <div class="feature"><span class="feature-icon">📚</span><div><h4>Complete Docs</h4><p>API reference, onboarding guide, demo script, and buyer handoff instructions.</p></div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>Real Estate AI Business-in-a-Box &mdash; <a href="/docs">API Docs</a> &middot; <a href="https://github.com" target="_blank">GitHub</a></p>
+  <p style="margin-top:0.5rem; font-size:0.8rem;">Built with FastAPI

@@ -1,0 +1,9 @@
+id,address,city,state,zip,beds,baths,sqft,lot_size,year_built,price,status,features
+1,123 Maple Street,Austin,TX,78701,4,3,2400,0.25 acres,2018,650000,active,"open floor plan,chef kitchen,pool,3-car garage,smart home"
+2,456 Oak Avenue,Austin,TX,78702,3,2,1850,0.18 acres,2015,485000,active,"updated kitchen,hardwood floors,covered patio,2-car garage"
+3,789 Pine Drive,Austin,TX,78703,5,4,3200,0.40 acres,2020,895000,active,"luxury finishes,home office,media room,outdoor kitchen,pool spa"
+4,321 Cedar Lane,Austin,TX,78704,2,1,1100,0.10 acres,1985,325000,active,"investment property,updated HVAC,new roof,near UT campus"
+5,654 Elm Court,Austin,TX,78705,4,3.5,2800,0.30 acres,2019,750000,pending,"corner lot,gourmet kitchen,primary suite,3-car garage,solar panels"
+6,987 Birch Boulevard,Austin,TX,78706,3,2.5,2100,0.22 acres,2017,565000,active,"open concept,quartz counters,covered porch,2-car garage"
+7,147 Willow Way,Austin,TX,78707,4,3,2600,0.35 acres,2021,720000,active,"new construction,energy efficient,designer finishes,large backyard"
+8,258 Spruce Street,Austin,TX,78708,2,2,1400,0.12 acres,2010,395000,sold,"condo style,rooftop deck,city views,walkable location"

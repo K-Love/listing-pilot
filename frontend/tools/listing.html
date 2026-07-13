@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Listing Writer — Real Estate AI</title>
+  <style>
+    :root { --primary:#1e50a0; --accent:#f59e0b; --bg:#f8fafc; --card:#fff; --text:#1e293b; --muted:#64748b; --border:#e2e8f0; --radius:12px; }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:var(--bg); color:var(--text); }
+    nav { background:var(--primary); color:#fff; padding:0 2rem; display:flex; align-items:center; justify-content:space-between; height:60px; }
+    .nav-brand { font-size:1.1rem; font-weight:700; text-decoration:none; color:#fff; }
+    .nav-links a { color:rgba(255,255,255,0.85); text-decoration:none; margin-left:1.5rem; font-size:0.9rem; }
+    .nav-links a:hover { color:#fff; }
+    .page-header { background:linear-gradient(135deg,var(--primary),#2563eb); color:#fff; padding:2.5rem 2rem; }
+    .page-header h1 { font-size:2rem; font-weight:800; }
+    .page-header p { opacity:0.85; margin-top:0.5rem; }
+    .container { max-width:1100px; margin:2rem auto; padding:0 2rem; display:grid; grid-template-columns:1fr 1fr; gap:2rem; }
+    @media(max-width:768px) { .container { grid-template-columns:1fr; } }
+    .card { background:var(--card); border-radius:var(--radius); padding:1.75rem; box-shadow:0 4px 24px rgba(30,80,160,0.08); border:1px solid var(--border); }
+    .card h2 { font-size:1.1rem; font-weight:700; margin-bottom:1.25rem; display:flex; align-items:center; gap:8px; }
+    label { display:block; font-size:0.85rem; font-weight:600; color:var(--muted); margin-bottom:0.35rem; margin-top:1rem; }
+    label:first-of-type { margin-top:0; }
+    input, select, textarea { width:100%; padding:0.6rem 0.85rem; border:1.5px solid var(--border); border-radius:8px; font-size:0.95rem; font-family:inherit; color:var(--text); background:#fff; transition:border-color 0.2s; }
+    input:focus, select:focus, textarea:focus { outline:none; border-color:var(--primary); }
+    textarea { resize:vertical; min-height:80px; }
+    .row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+    .btn { display:inline-flex; align-items:center; gap:8px; padding:0.75rem 1.5rem; border-radius:8px; font-weight:600; font-size:1rem; cursor:pointer; border:none; transition:all 0.2s; width:100%; justify-content:center; margin-top:1.25rem; }
+    .btn-primary { background:var(--primary); color:#fff; }
+    .btn-primary:hover { background:#163a78; }
+    .btn-primary:disabled { opacity:0.6; cursor:not-allowed; }
+    .result-box { background:#f8fafc; border:1.5px solid var(--border); border-radius:8px; padding:1.25rem; min-height:200px; font-size:0.95rem; line-height:1.7; white-space:pre-wrap; color:var(--text); }
+    .result-placeholder { color:var(--muted); font-style:italic; }
+    .copy-btn { display:inline-flex; align-items:center; gap:6px; padding:0.5rem 1rem; border-radius:6px; font-size:0.85rem; font-weight:600; cursor:pointer; border:1.5px solid var(--border); background:#fff; color:var(--muted); transition:all 0.2s; margin-top:0.75rem; }
+    .copy-btn:hover { border-color:var(--primary); color:var(--primary); }
+    .copy-btn.copied { background:var(--primary); color:#fff; border-color:var(--primary); }
+    .meta { display:flex; gap:1rem; margin-top:0.75rem; flex-wrap:wrap; }
+    .meta-badge { background:#eff6ff; color:var(--primary); font-size:0.78rem; font-weight:600; padding:3px 10px; border-radius:20px; }
+    .spinner { display:none; width:18px; height:18px; border:2px solid rgba(255,255,255,0.3); border-top-color:#fff; border-radius:50%; animation:spin 0.7s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .demo-note { background:#fef3c7; border:1px solid #fcd34d; border-radius:8px; padding:0.75rem 1rem; font-size:0.85rem; color:#92400e; margin-bottom:1.25rem; }
+    .sample-btn { background:none; border:1.5px dashed var(--border); border-radius:8px; padding:0.5rem 1rem; font-size:0.85rem; color:var(--muted); cursor:pointer; width:100%; margin-top:0.75rem; transition:all 0.2s; }
+    .sample-btn:hover { border-color:var(--primary); color:var(--primary); }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-brand">🏠 Real Estate AI</a>
+  <div class="nav-links">
+    <a href="/tools/listing">Listing Writer</a>
+    <a href="/tools/cma">CMA Tool</a>
+    <a href="/tools/social">Social Posts</a>
+    <a href="/docs" target="_blank">API Docs</a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <h1>🏡 Listing Writer</h1>
+  <p>Generate professional MLS listing descriptions in seconds.</p>
+</div>
+
+<div class="container">
+  <!-- Form -->
+  <div class="card">
+    <h2>📝 Property Details</h2>
+    <div class="demo-note">⚡ <strong>Demo Mode</strong> — Click "Load Sample" to prefill with example data, or enter your own.</div>
+
+    <label>Property Address</label>
+    <input type="text" id="address" placeholder="123 Maple Street, Austin, TX 78701" />
+
+    <div class="row">
+      <div>
+        <label>Bedrooms</label>
+        <input type="number" id="beds" placeholder="4" min="1" max="20" />
+      </div>
+      <div>
+        <label>Bathrooms</label>
+        <input type="number" id="baths" placeholder="3" min="1" max="20" step="0.5" />
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>Square Footage</label>
+        <input type="number" id="sqft" placeholder="2400" />
+      </div>
+      <div>
+        <label>Year Built</label>
+        <input type="number" id="year_built" placeholder="2018" />
+      </div>
+    </div>
+
+    <label>List Price ($)</label>
+    <input type="number" id="price" placeholder="650000" />
+
+    <label>Neighborhood / Area</label>
+    <input type="text" id="neighborhood" placeholder="South Congress" />
+
+    <label>Key Features (one per line)</label>
+    <textarea id="features" placeholder="open floor plan&#10;chef's kitchen&#10;pool&#10;3-car garage"></textarea>
+
+    <div class="row">
+      <div>
+        <label>Tone</label>
+        <select id="tone">
+          <option value="professional">Professional</option>
+          <option value="luxury">Luxury</option>
+          <option value="family">Family</option>
+          <option value="investment">Investment</option>
+          <option value="casual">Casual</option>
+        </select>
+      </div>
+      <div>
+        <label>Length</label>
+        <select id="length">
+          <option value="short">Short (~100 words)</option>
+          <option value="medium" selected>Medium (~200 words)</option>
+          <option value="long">Long (~350 words)</option>
+        </select>
+      </div>
+    </div>
+
+    <button class="sample-btn" onclick="loadSample()">📋 Load Sample Property</button>
+    <button class="btn btn-primary" id="generateBtn" onclick="generateListing()">
+      <span class="spinner" id="spinner"></span>
+      ✨ Generate Listing
+    </button>
+  </div>
+
+  <!-- Result -->
+  <div class="card">
+    <h2>📄 Generated Listing</h2>
+    <div class="result-box" id="result">
+      <span class="result-placeholder">Your listing description will appear here...</span>
+    </div>
+    <div class="meta" id="meta" style="display:none;">
+      <span class="meta-badge" id="wordCount"></span>
+      <span class="meta-badge" id="toneLabel"></span>
+    </div>
+    <button class="copy-btn" id="copyBtn" onclick="copyResult()" style="display:none;">
+      📋 Copy to Clipboard
+    </button>
+  </div>
+</div>
+
+<script>
+  const API_BASE = '';
+
+  function loadSample() {
+    document.getElementById('address').value = '123 Maple Street, Austin, TX 78701';
+    document.getElementById('beds').value = '4';
+    document.getElementById('baths').value = '3';
+    document.getElementById('sqft').value = '2400';
+    document.getElementById('year_built').value = '2018';
+    document.getElementById('price').value = '650000';
+    document.getElementById('neighborhood').value = 'South Congress';
+    document.getElementById('features').value = "open floor plan\nchef's kitchen\npool\n3-car garage\nsmart home system";
+    document.getElementById('tone').value = 'luxury';
+    document.getElementById('length').value = 'medium';
+  }
+
+  async function generateListing() {
+    const btn = document.getElementById('generateBtn');
+    const spinner = document.getElementById('spinner');
+    const resultEl = document.getElementById('result');
+
+    const features = document.getElementById('features').value
+      .split('\n').map(f => f.trim()).filter(Boolean);
+
+    const payload = {
+      property_details: {
+        address: document.getElementById('address').value || '123 Main St',
+        beds: parseInt(document.getElementById('beds').value) || 3,
+        baths: parseFloat(document.getElementById('baths').value) || 2,
+        sqft: parseInt(document.getElementById('sqft').value) || 1800,
+        year_built: parseInt(document.getElementById('year_built').value) || null,
+        price: parseInt(document.getElementById('price').value) || 0,
+        neighborhood: document.getElementById('neighborhood').value || '',
+        features: features,
+      },
+      tone: document.getElementById('tone').value,
+      length: document.getElementById('length').value,
+    };
+
+    btn.disabled = true;
+    spinner.style.display = 'block';
+    resultEl.innerHTML = '<span class="result-placeholder">Generating your listing...</span>';
+
+    try {
+      const res = await fetch(`${API_BASE}/api/listing-writer`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) throw new Error(`API error: ${res.status}`);
+      const data = await res.json();
+
+      resultEl.textContent = data.listing_text;
+      document.getElementById('wordCount').textContent = `${data.word_count || data.listing_text.split(' ').length} words`;
+      document.getElementById('toneLabel').textContent = payload.tone.charAt(0).toUpperCase() + payload.tone.slice(1);
+      document.getElementById('meta').style.display = 'flex';
+      document.getElementById('copyBtn').style.display = 'inline-flex';
+
+    } catch (err) {
+      resultEl.innerHTML = `<span style="color:#dc2626;">Error: ${err.message}. Make sure the backend is running on port 8000.</span>`;
+    } finally {
+      btn.disabled = false;
+      spinner.style.display = 'none';
+    }
+  }
+
+  function copyResult() {
+    const text = document.getElementById('result').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = '✅ Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = '📋 Copy to Clipboard'; btn.classList.remove('copied'); }, 2000);
+    });
+  }
+</script>
+</body>
+</html>

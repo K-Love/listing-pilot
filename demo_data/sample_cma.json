@@ -1,0 +1,67 @@
+{
+  "subject_property": {
+    "address": "456 Oak Avenue, Austin, TX 78702",
+    "beds": 3,
+    "baths": 2,
+    "sqft": 1850,
+    "lot_size": "0.18 acres",
+    "year_built": 2015
+  },
+  "comps": [
+    {
+      "address": "400 Oak Ave, Austin TX",
+      "price": 475000,
+      "sqft": 1800,
+      "beds": 3,
+      "baths": 2,
+      "sold_date": "2025-05-20",
+      "distance_miles": 0.3,
+      "days_on_market": 12
+    },
+    {
+      "address": "500 Elm St, Austin TX",
+      "price": 495000,
+      "sqft": 1900,
+      "beds": 3,
+      "baths": 2,
+      "sold_date": "2025-04-15",
+      "distance_miles": 0.5,
+      "days_on_market": 8
+    },
+    {
+      "address": "350 Maple Ave, Austin TX",
+      "price": 468000,
+      "sqft": 1780,
+      "beds": 3,
+      "baths": 2,
+      "sold_date": "2025-06-02",
+      "distance_miles": 0.4,
+      "days_on_market": 21
+    },
+    {
+      "address": "600 Pine St, Austin TX",
+      "price": 510000,
+      "sqft": 1950,
+      "beds": 3,
+      "baths": 2.5,
+      "sold_date": "2025-05-08",
+      "distance_miles": 0.7,
+      "days_on_market": 5
+    }
+  ],
+  "market_stats": {
+    "median_price": 485000,
+    "avg_days_on_market": 11.5,
+    "inventory_months": 1.8,
+    "yoy_appreciation": 0.062,
+    "market_condition": "seller's market"
+  },
+  "cma_result": {
+    "estimated_value": 487000,
+    "price_range_low": 462000,
+    "price_range_high": 525000,
+    "price_per_sqft": 263.51,
+    "recommended_list_price": 495000,
+    "comps_used": 4
+  }
+}

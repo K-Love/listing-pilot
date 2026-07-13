@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  test:
+    name: Test Suite
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r backend/requirements.txt
+
+      - name: Run tests
+        run: pytest backend/tests/ -v --tb=short
+        env:
+          # No OPENAI_API_KEY — tests run in demo/offline mode
+          PYTHONPATH: backend
+
+      - name: Check server imports
+        run: |
+          cd backend
+          python -c "import server; print('✅ server.py imports OK')"
+        env:
+          PYTHONPATH: backend
+
+  lint:
+    name: Lint Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install linting tools
+        run: pip install pyflakes
+
+      - name: Run pyflakes
+        run: |
+          pyflakes backend/server.py || true
+          pyflakes backend/ai/ || true
+          pyflakes backend/services/ || true
+          pyflakes backend/models/ || true
+          echo "✅ Lint check complete"

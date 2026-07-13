@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CMA Tool — Real Estate AI</title>
+  <style>
+    :root { --primary:#1e50a0; --accent:#f59e0b; --bg:#f8fafc; --card:#fff; --text:#1e293b; --muted:#64748b; --border:#e2e8f0; --radius:12px; }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:var(--bg); color:var(--text); }
+    nav { background:var(--primary); color:#fff; padding:0 2rem; display:flex; align-items:center; justify-content:space-between; height:60px; }
+    .nav-brand { font-size:1.1rem; font-weight:700; text-decoration:none; color:#fff; }
+    .nav-links a { color:rgba(255,255,255,0.85); text-decoration:none; margin-left:1.5rem; font-size:0.9rem; }
+    .page-header { background:linear-gradient(135deg,#166534,#16a34a); color:#fff; padding:2.5rem 2rem; }
+    .page-header h1 { font-size:2rem; font-weight:800; }
+    .page-header p { opacity:0.85; margin-top:0.5rem; }
+    .container { max-width:1100px; margin:2rem auto; padding:0 2rem; }
+    .card { background:var(--card); border-radius:var(--radius); padding:1.75rem; box-shadow:0 4px 24px rgba(30,80,160,0.08); border:1px solid var(--border); margin-bottom:1.5rem; }
+    .card h2 { font-size:1.1rem; font-weight:700; margin-bottom:1.25rem; }
+    label { display:block; font-size:0.85rem; font-weight:600; color:var(--muted); margin-bottom:0.35rem; margin-top:1rem; }
+    input, select { width:100%; padding:0.6rem 0.85rem; border:1.5px solid var(--border); border-radius:8px; font-size:0.95rem; font-family:inherit; color:var(--text); background:#fff; }
+    input:focus, select:focus { outline:none; border-color:var(--primary); }
+    .row { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:1rem; }
+    .btn { display:inline-flex; align-items:center; gap:8px; padding:0.75rem 1.5rem; border-radius:8px; font-weight:600; font-size:1rem; cursor:pointer; border:none; transition:all 0.2s; }
+    .btn-primary { background:var(--primary); color:#fff; }
+    .btn-primary:hover { background:#163a78; }
+    .btn-success { background:#16a34a; color:#fff; }
+    .btn-success:hover { background:#15803d; }
+    .btn-sm { padding:0.4rem 0.85rem; font-size:0.85rem; }
+    .comp-row { display:grid; grid-template-columns:2fr 1fr 0.7fr 0.5fr 0.5fr 1fr auto; gap:0.5rem; align-items:center; margin-bottom:0.5rem; }
+    .comp-row input { margin-top:0; }
+    .comp-header { display:grid; grid-template-columns:2fr 1fr 0.7fr 0.5fr 0.5fr 1fr auto; gap:0.5rem; margin-bottom:0.35rem; }
+    .comp-header span { font-size:0.78rem; font-weight:600; color:var(--muted); }
+    .remove-btn { background:none; border:none; color:#dc2626; cursor:pointer; font-size:1.1rem; padding:0.3rem; }
+    .result-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1rem; margin-bottom:1.5rem; }
+    .value-card { background:#eff6ff; border-radius:10px; padding:1.25rem; text-align:center; }
+    .value-card .label { font-size:0.8rem; color:var(--muted); font-weight:600; margin-bottom:0.35rem; }
+    .value-card .value { font-size:1.6rem; font-weight:800; color:var(--primary); }
+    .value-card .sub { font-size:0.8rem; color:var(--muted); margin-top:0.25rem; }
+    .summary-box { background:#f8fafc; border:1.5px solid var(--border); border-radius:8px; padding:1.25rem; line-height:1.7; font-size:0.95rem; }
+    .demo-note { background:#fef3c7; border:1px solid #fcd34d; border-radius:8px; padding:0.75rem 1rem; font-size:0.85rem; color:#92400e; margin-bottom:1.25rem; }
+    .sample-btn { background:none; border:1.5px dashed var(--border); border-radius:8px; padding:0.5rem 1rem; font-size:0.85rem; color:var(--muted); cursor:pointer; margin-top:0.75rem; transition:all 0.2s; }
+    .sample-btn:hover { border-color:var(--primary); color:var(--primary); }
+    #results { display:none; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-brand">🏠 Real Estate AI</a>
+  <div class="nav-links">
+    <a href="/tools/listing">Listing Writer</a>
+    <a href="/tools/cma">CMA Tool</a>
+    <a href="/tools/social">Social Posts</a>
+    <a href="/docs" target="_blank">API Docs</a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <h1>📊 CMA Assistant</h1>
+  <p>Generate a Comparative Market Analysis with estimated value and PDF report.</p>
+</div>
+
+<div class="container">
+  <div class="card">
+    <h2>🏠 Subject Property</h2>
+    <div class="demo-note">⚡ <strong>Demo Mode</strong> — Click "Load Sample" to prefill with example data.</div>
+
+    <label>Property Address</label>
+    <input type="text" id="address" placeholder="456 Oak Avenue, Austin, TX 78702" />
+
+    <div class="row">
+      <div><label>Bedrooms</label><input type="number" id="sub_beds" placeholder="3" /></div>
+      <div><label>Bathrooms</label><input type="number" id="sub_baths" placeholder="2" step="0.5" /></div>
+      <div><label>Square Footage</label><input type="number" id="sub_sqft" placeholder="1850" /></div>
+    </div>
+
+    <button class="sample-btn" onclick="loadSample()">📋 Load Sample Data</button>
+  </div>
+
+  <div class="card">
+    <h2>🔍 Comparable Sales</h2>
+    <div class="comp-header">
+      <span>Address</span><span>Sale Price</span><span>Sq Ft</span><span>Bed</span><span>Bath</span><span>Sold Date</span><span></span>
+    </div>
+    <div id="comps-container"></div>
+    <button class="btn btn-sm" onclick="addComp()" style="margin-top:0.75rem; background:#f1f5f9; border:1.5px solid var(--border); color:var(--text);">+ Add Comp</button>
+
+    <div style="margin-top:1.5rem;">
+      <button class="btn btn-success" onclick="generateCMA()" style="width:100%;">📊 Generate CMA Report</button>
+    </div>
+  </div>
+
+  <div id="results">
+    <div class="card">
+      <h2>📈 Valuation Results</h2>
+      <div class="result-grid">
+        <div class="value-card">
+          <div class="label">ESTIMATED VALUE</div>
+          <div class="value" id="est-value">—</div>
+          <div class="sub">Market Value</div>
+        </div>
+        <div class="value-card" style="background:#f0fdf4;">
+          <div class="label">PRICE RANGE LOW</div>
+          <div class="value" id="range-low" style="color:#16a34a;">—</div>
+          <div class="sub">Conservative</div>
+        </div>
+        <div class="value-card" style="background:#fff7ed;">
+          <div class="label">PRICE RANGE HIGH</div>
+          <div class="value" id="range-high" style="color:#ea580c;">—</div>
+          <div class="sub">Optimistic</div>
+        </div>
+        <div class="value-card" style="background:#fdf4ff;">
+          <div class="label">PRICE PER SQ FT</div>
+          <div class="value" id="ppsf" style="color:#9333ea;">—</div>
+          <div class="sub">Avg of Comps</div>
+        </div>
+      </div>
+      <h3 style="margin-bottom:0.75rem; font-size:1rem;">Market Analysis Summary</h3>
+      <div class="summary-box" id="summary"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let compCount = 0;
+
+  function addComp(data = {}) {
+    compCount++;
+    const id = compCount;
+    const div = document.createElement('div');
+    div.className = 'comp-row';
+    div.id = `comp-${id}`;
+    div.innerHTML = `
+      <input type="text" placeholder="100 Maple St, Austin TX" value="${data.address||''}" data-field="address" />
+      <input type="number" placeholder="635000" value="${data.price||''}" data-field="price" />
+      <input type="number" placeholder="2350" value="${data.sqft||''}" data-field="sqft" />
+      <input type="number" placeholder="4" value="${data.beds||''}" data-field="beds" />
+      <input type="number" placeholder="3" value="${data.baths||''}" data-field="baths" step="0.5" />
+      <input type="text" placeholder="2025-05-15" value="${data.sold_date||''}" data-field="sold_date" />
+      <button class="remove-btn" onclick="removeComp(${id})">✕</button>
+    `;
+    document.getElementById('comps-container').appendChild(div);
+  }
+
+  function removeComp(id) {
+    const el = document.getElementById(`comp-${id}`);
+    if (el) el.remove();
+  }
+
+  function getComps() {
+    const rows = document.querySelectorAll('.comp-row');
+    return Array.from(rows).map(row => ({
+      address: row.querySelector('[data-field="address"]').value || 'Unknown',
+      price: parseFloat(row.querySelector('[data-field="price"]').value) || 0,
+      sqft: parseInt(row.querySelector('[data-field="sqft"]').value) || 0,
+      beds: parseInt(row.querySelector('[data-field="beds"]').value) || 0,
+      baths: parseFloat(row.querySelector('[data-field="baths"]').value) || 0,
+      sold_date: row.querySelector('[data-field="sold_date"]').value || '2025-01-01',
+    })).filter(c => c.price > 0);
+  }
+
+  function loadSample() {
+    document.getElementById('address').value = '456 Oak Avenue, Austin, TX 78702';
+    document.getElementById('sub_beds').value = '3';
+    document.getElementById('sub_baths').value = '2';
+    document.getElementById('sub_sqft').value = '1850';
+    document.getElementById('comps-container').innerHTML = '';
+    compCount = 0;
+    addComp({address:'100 Maple St, Austin TX', price:635000, sqft:2350, beds:4, baths:3, sold_date:'2025-05-15'});
+    addComp({address:'200 Oak Ave, Austin TX', price:660000, sqft:2450, beds:4, baths:3, sold_date:'2025-04-28'});
+    addComp({address:'300 Pine Dr, Austin TX', price:645000, sqft:2380, beds:4, baths:2.5, sold_date:'2025-06-01'});
+  }
+
+  async function generateCMA() {
+    const comps = getComps();
+    if (comps.length === 0) { alert('Please add at least one comparable sale.'); return; }
+
+    const payload = {
+      address: document.getElementById('address').value || '456 Oak Ave',
+      comps,
+      subject_sqft: parseInt(document.getElementById('sub_sqft').value) || null,
+      subject_beds: parseInt(document.getElementById('sub_beds').value) || null,
+      subject_baths: parseFloat(document.getElementById('sub_baths').value) || null,
+    };
+
+    try {
+      const res = await fetch('/api/cma', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error(`API error: ${res.status}`);
+      const data = await res.json();
+
+      document.getElementById('est-value').textContent = '$' + data.estimated_value.toLocaleString();
+      document.getElementById('range-low').textContent = '$' + data.price_range_low.toLocaleString();
+      document.getElementById('range-high').textContent = '$' + data.price_range_high.toLocaleString();
+      document.getElementById('ppsf').textContent = data.price_per_sqft ? '$' + data.price_per_sqft.toFixed(0) : 'N/A';
+      document.getElementById('summary').textContent = data.cma_summary;
+      document.getElementById('results').style.display = 'block';
+      document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+    } catch (err) {
+      alert('Error: ' + err.message + '. Make sure the backend is running on port 8000.');
+    }
+  }
+
+  // Initialize with 2 empty comp rows
+  addComp();
+  addComp();
+</script>
+</body>
+</html>
