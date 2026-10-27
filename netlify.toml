@@ -1,0 +1,23 @@
+# Netlify hosts a *static buyer preview*, not the Python FastAPI application.
+# Run python backend/server.py on a Python host for the real API and tool UIs.
+[build]
+  publish = "frontend"
+
+# Show an honest buyer-facing static preview instead of an API-dependent UI.
+[[redirects]]
+  from = "/"
+  to = "/preview.html"
+  status = 200
+  force = true
+
+# Original tool UIs depend on /api/* and will not work on static hosting.
+[[redirects]]
+  from = "/tools/*"
+  to = "/preview.html"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/docs"
+  to = "https://github.com/K-Love/listing-pilot/blob/main/docs/API_REFERENCE.md"
+  status = 302
