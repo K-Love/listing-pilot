@@ -63,3 +63,6 @@ release/listing-pilot.zip
 
 # Logs
 *.log
+
+# Built into the Netlify function during deploy
+netlify/functions/vendor/

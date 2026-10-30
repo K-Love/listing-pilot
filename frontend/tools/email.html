@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Email Campaigns — Real Estate AI</title>
+  <style>
+    :root { --primary:#1e50a0; --accent:#f59e0b; --bg:#f8fafc; --card:#fff; --text:#1e293b; --muted:#64748b; --border:#e2e8f0; --radius:12px; }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:var(--bg); color:var(--text); }
+    nav { background:var(--primary); color:#fff; padding:0.65rem 1.25rem; display:flex; align-items:center; justify-content:space-between; min-height:60px; height:auto; flex-wrap:wrap; gap:0.5rem 1rem; }
+    .nav-brand { font-size:1.1rem; font-weight:700; text-decoration:none; color:#fff; }
+    .nav-links { display:flex; flex-wrap:wrap; gap:0.45rem 0.9rem; }
+    .nav-links a { color:rgba(255,255,255,0.85); text-decoration:none; font-size:0.88rem; }
+    .nav-links a:hover { color:#fff; }
+    .page-header { background:linear-gradient(135deg,#9a3412,#ea580c); color:#fff; padding:2.5rem 1.25rem; }
+    .page-header h1 { font-size:2rem; font-weight:800; }
+    .page-header p { opacity:0.9; margin-top:0.5rem; max-width:640px; }
+    .container { max-width:1100px; margin:2rem auto; padding:0 1.25rem; display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
+    @media(max-width:800px) { .container { grid-template-columns:1fr; } }
+    .card { background:var(--card); border-radius:var(--radius); padding:1.75rem; box-shadow:0 4px 24px rgba(30,80,160,0.08); border:1px solid var(--border); }
+    .card h2 { font-size:1.1rem; font-weight:700; margin-bottom:1rem; }
+    label { display:block; font-size:0.85rem; font-weight:600; color:var(--muted); margin:0.9rem 0 0.35rem; }
+    input, select, textarea { width:100%; padding:0.6rem 0.85rem; border:1.5px solid var(--border); border-radius:8px; font-size:0.95rem; font-family:inherit; color:var(--text); background:#fff; }
+    input:focus, select:focus, textarea:focus { outline:none; border-color:var(--primary); }
+    textarea { min-height:70px; resize:vertical; }
+    .row { display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; }
+    .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:0.75rem 1.25rem; border-radius:8px; font-weight:600; font-size:1rem; cursor:pointer; border:none; width:100%; margin-top:1rem; background:var(--primary); color:#fff; }
+    .btn:disabled { opacity:0.6; cursor:not-allowed; }
+    .sample-btn { background:none; border:1.5px dashed var(--border); border-radius:8px; padding:0.5rem 1rem; font-size:0.85rem; color:var(--muted); cursor:pointer; width:100%; margin-top:0.9rem; }
+    .demo-note { background:#fef3c7; border:1px solid #fcd34d; border-radius:8px; padding:0.75rem 1rem; font-size:0.85rem; color:#92400e; margin-bottom:0.5rem; }
+    .email-card { border:1px solid var(--border); border-radius:10px; padding:1rem; margin-bottom:0.9rem; background:#f8fafc; }
+    .email-card h3 { font-size:0.98rem; margin-bottom:0.35rem; }
+    .meta { color:var(--muted); font-size:0.78rem; font-weight:700; margin-bottom:0.5rem; }
+    .body { white-space:pre-wrap; line-height:1.55; font-size:0.92rem; }
+    .copy-btn { margin-top:0.6rem; width:auto; padding:0.4rem 0.8rem; font-size:0.82rem; background:#fff; color:var(--primary); border:1.5px solid var(--border); }
+    .placeholder { color:var(--muted); font-style:italic; }
+    .error { color:#b91c1c; margin-top:0.75rem; font-size:0.9rem; }
+  </style>
+</head>
+<body>
+<nav>
+  <a href="/" class="nav-brand">🏠 Real Estate AI</a>
+  <div class="nav-links">
+    <a href="/tools/listing">Listings</a>
+    <a href="/tools/cma">CMA</a>
+    <a href="/tools/social">Social</a>
+    <a href="/tools/email">Email</a>
+    <a href="/tools/outreach">Outreach</a>
+    <a href="/docs">API Docs</a>
+  </div>
+</nav>
+<div class="page-header">
+  <h1>✉️ Email Campaigns</h1>
+  <p>Draft a short sequence for buyers, sellers, investors, past clients, or cold leads.</p>
+</div>
+<div class="container">
+  <div class="card">
+    <h2>Audience</h2>
+    <div class="demo-note">⚡ <strong>Demo mode</strong> — sample copy from the included templates. Review before you send it.</div>
+    <label>Recipient type</label>
+    <select id="recipient_type">
+      <option value="buyer">Buyer</option>
+      <option value="seller">Seller</option>
+      <option value="investor">Investor</option>
+      <option value="past_client">Past client</option>
+      <option value="cold_lead">Cold lead</option>
+    </select>
+    <div class="row">
+      <div><label>First name</label><input id="first_name" placeholder="Alex" /></div>
+      <div><label>Agent name</label><input id="agent_name" placeholder="Sarah Johnson" /></div>
+    </div>
+    <label>Property address</label>
+    <input id="address" placeholder="123 Maple Street, Austin, TX" />
+    <div class="row">
+      <div><label>Price</label><input id="price" type="number" placeholder="650000" /></div>
+      <div><label>Emails in sequence</label><input id="num_emails" type="number" min="1" max="7" value="3" /></div>
+    </div>
+    <label>Highlight</label>
+    <textarea id="highlight" placeholder="open floor plan, pool, and a chef's kitchen"></textarea>
+    <button class="sample-btn" onclick="loadSample()">📋 Load Sample</button>
+    <button class="btn" id="generateBtn" onclick="generateEmails()">✨ Generate emails</button>
+    <p class="error" id="error" hidden></p>
+  </div>
+  <div class="card">
+    <h2>Sequence</h2>
+    <div id="results"><p class="placeholder">Generated emails will appear here.</p></div>
+  </div>
+</div>
+<script>
+  function loadSample() {
+    document.getElementById('recipient_type').value = 'buyer';
+    document.getElementById('first_name').value = 'Alex';
+    document.getElementById('agent_name').value = 'Sarah Johnson';
+    document.getElementById('address').value = '123 Maple Street, Austin, TX 78701';
+    document.getElementById('price').value = '650000';
+    document.getElementById('num_emails').value = '3';
+    document.getElementById('highlight').value = "an open floor plan, a chef's kitchen, and a pool";
+  }
+
+  async function generateEmails() {
+    const btn = document.getElementById('generateBtn');
+    const error = document.getElementById('error');
+    const results = document.getElementById('results');
+    error.hidden = true;
+    btn.disabled = true;
+    results.innerHTML = '<p class="placeholder">Writing the sequence...</p>';
+    const price = parseInt(document.getElementById('price').value, 10);
+    const payload = {
+      recipient_type: document.getElementById('recipient_type').value,
+      num_emails: Math.min(7, Math.max(1, parseInt(document.getElementById('num_emails').value, 10) || 3)),
+      context: {
+        first_name: document.getElementById('first_name').value || 'there',
+        agent_name: document.getElementById('agent_name').value || 'Your Agent',
+        address: document.getElementById('address').value || 'the property',
+        property_address: document.getElementById('address').value || 'the property',
+        price: Number.isFinite(price) ? price : 550000,
+        highlight: document.getElementById('highlight').value || 'modern finishes and a great location',
+        beds: 4,
+        baths: 3,
+        sqft: '2,400'
+      }
+    };
+    try {
+      const res = await fetch('/api/email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) throw new Error('API error ' + res.status);
+      const data = await res.json();
+      results.innerHTML = '';
+      (data.emails || []).forEach(email => {
+        const card = document.createElement('article');
+        card.className = 'email-card';
+        const delay = email.send_delay_days === 0 ? 'Send immediately' : 'Day ' + email.send_delay_days;
+        card.innerHTML = '<div class="meta">Step ' + (email.sequence_step || '') + ' · ' + delay + '</div><h3></h3><div class="body"></div>';
+        card.querySelector('h3').textContent = email.subject;
+        card.querySelector('.body').textContent = email.body;
+        const copy = document.createElement('button');
+        copy.className = 'btn copy-btn';
+        copy.type = 'button';
+        copy.textContent = '📋 Copy';
+        copy.onclick = () => navigator.clipboard.writeText(email.subject + '\n\n' + email.body).then(() => { copy.textContent = '✅ Copied'; });
+        card.appendChild(copy);
+        results.appendChild(card);
+      });
+      if (!data.emails || !data.emails.length) results.innerHTML = '<p class="placeholder">No emails were returned.</p>';
+    } catch (err) {
+      results.innerHTML = '<p class="placeholder">Nothing generated.</p>';
+      error.hidden = false;
+      error.textContent = err.message + '. The demo API did not respond.';
+    } finally {
+      btn.disabled = false;
+    }
+  }
+</script>
+</body>
+</html>

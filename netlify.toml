@@ -1,0 +1,48 @@
+# Publish the static UI. /api/* is the demo backend (Netlify Function),
+# which runs the same Python generators as `python backend/server.py`.
+[build]
+  publish = "frontend"
+  command = "rm -rf netlify/functions/vendor && mkdir -p netlify/functions/vendor && cp -a backend netlify/functions/vendor/backend && rm -rf netlify/functions/vendor/backend/tests netlify/functions/vendor/backend/__pycache__"
+
+[build.environment]
+  PYTHON_VERSION = "3.11"
+
+[functions]
+  directory = "netlify/functions"
+  included_files = ["backend/**", "netlify/functions/vendor/backend/**"]
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/docs"
+  to = "/api-docs.html"
+  status = 200
+
+[[redirects]]
+  from = "/tools/listing"
+  to = "/tools/listing.html"
+  status = 200
+
+[[redirects]]
+  from = "/tools/cma"
+  to = "/tools/cma.html"
+  status = 200
+
+[[redirects]]
+  from = "/tools/social"
+  to = "/tools/social.html"
+  status = 200
+
+[[redirects]]
+  from = "/tools/email"
+  to = "/tools/email.html"
+  status = 200
+
+[[redirects]]
+  from = "/tools/outreach"
+  to = "/tools/outreach.html"
+  status = 200

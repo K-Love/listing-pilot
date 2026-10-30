@@ -1,0 +1,7 @@
+/api/*  /.netlify/functions/api/:splat  200
+/docs  /api-docs.html  200
+/tools/listing  /tools/listing.html  200
+/tools/cma  /tools/cma.html  200
+/tools/social  /tools/social.html  200
+/tools/email  /tools/email.html  200
+/tools/outreach  /tools/outreach.html  200

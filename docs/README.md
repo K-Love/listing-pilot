@@ -128,6 +128,11 @@ fly secrets set OPENAI_API_KEY=sk-...
 fly deploy
 ```
 
+### Netlify (static preview + demo API)
+`netlify.toml` publishes `frontend/` and routes `/api/*` to a Python function that runs the same demo generators as the FastAPI app. The hosted preview stays in demo mode even if an OpenAI key is present, so anonymous visitors cannot spend it. For live model output, run `python backend/server.py` or the included `Dockerfile` on a Python host.
+
+The production site 404s when Netlify publishes the repository root, because there is no root `index.html`. This config publishes `frontend/` instead.
+
 ---
 
 ## 🧪 Running Tests

@@ -146,7 +146,10 @@ def generate_cma(address: str, comps: List[Any]) -> Dict[str, Any]:
             price_range_low=result["price_range_low"],
             price_range_high=result["price_range_high"],
         )
-        result["cma_pdf_url"] = f"/api/cma/pdf/{os.path.basename(pdf_path)}"
+        if pdf_path and os.path.isfile(pdf_path):
+            result["cma_pdf_url"] = f"/api/cma/pdf/{os.path.basename(pdf_path)}"
+        else:
+            result["cma_pdf_url"] = None
     except Exception:
         result["cma_pdf_url"] = None
 
