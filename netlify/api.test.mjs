@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import handler from "./api.mjs";
+import handler from "./functions/api.mjs";
 
 function call(path, body) {
   return handler(new Request(`https://preview.example${path}`, {

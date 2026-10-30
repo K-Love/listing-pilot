@@ -63,4 +63,4 @@ jobs:
           echo "✅ Lint check complete"
 
       - name: Test hosted demo API
-        run: node --test netlify/functions/api.test.mjs
+        run: node --test netlify/api.test.mjs
