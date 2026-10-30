@@ -1,7 +1,7 @@
-"""Request dispatch shared by the FastAPI server and the Netlify demo function.
+"""Request dispatch for the FastAPI server and the Docker image.
 
-The public Netlify preview calls this in demo mode. The same functions serve
-local and Docker deployments, so both surfaces stay in step.
+The public Netlify preview cannot run this Python package. It serves a
+JavaScript demo of the same routes from netlify/functions/api.mjs.
 """
 
 from __future__ import annotations

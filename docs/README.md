@@ -129,9 +129,9 @@ fly deploy
 ```
 
 ### Netlify (static preview + demo API)
-`netlify.toml` publishes `frontend/` and routes `/api/*` to a Python function that runs the same demo generators as the FastAPI app. The hosted preview stays in demo mode even if an OpenAI key is present, so anonymous visitors cannot spend it. For live model output, run `python backend/server.py` or the included `Dockerfile` on a Python host.
+`netlify.toml` publishes `frontend/`. That is what removes the production 404, which happens when Netlify publishes the repository root and there is no root `index.html`.
 
-The production site 404s when Netlify publishes the repository root, because there is no root `index.html`. This config publishes `frontend/` instead.
+Netlify functions do not run Python. `netlify/functions/api.mjs` answers `/api/*` with a JavaScript demo of the same five endpoints, always in demo mode. For the Python app and optional OpenAI generation, run `python backend/server.py` or the included `Dockerfile` on a Python host.
 
 ---
 

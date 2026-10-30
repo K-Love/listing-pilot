@@ -61,3 +61,6 @@ jobs:
           pyflakes backend/services/ || true
           pyflakes backend/models/ || true
           echo "✅ Lint check complete"
+
+      - name: Test hosted demo API
+        run: node --test netlify/functions/api.test.mjs

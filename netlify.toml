@@ -1,21 +1,8 @@
-# Publish the static UI. /api/* is the demo backend (Netlify Function),
-# which runs the same Python generators as `python backend/server.py`.
+# Publish the static UI. Netlify functions are JavaScript-only, so /api/*
+# is a demo implementation of the same endpoints as `python backend/server.py`.
+# Self-host that Python app, or the Dockerfile, for OpenAI-backed generation.
 [build]
   publish = "frontend"
-  command = "rm -rf netlify/functions/vendor && mkdir -p netlify/functions/vendor && cp -a backend netlify/functions/vendor/backend && rm -rf netlify/functions/vendor/backend/tests netlify/functions/vendor/backend/__pycache__"
-
-[build.environment]
-  PYTHON_VERSION = "3.11"
-
-[functions]
-  directory = "netlify/functions"
-  included_files = ["backend/**", "netlify/functions/vendor/backend/**"]
-
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/api/:splat"
-  status = 200
-  force = true
 
 [[redirects]]
   from = "/docs"

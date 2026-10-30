@@ -13,11 +13,6 @@ from fastapi.testclient import TestClient
 import server
 from demo_http import handle_api, normalize_path
 
-ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-sys.path.insert(0, os.path.join(ROOT, "netlify", "functions"))
-from api import handler  # noqa: E402
-
-
 client = TestClient(server.app)
 
 LISTING = {
@@ -125,23 +120,13 @@ def test_cma_pdf_downloads():
     assert downloaded.content.startswith(b"%PDF")
 
 
-def test_netlify_handler_matches_demo_api_and_inlines_pdf(monkeypatch):
-    monkeypatch.setenv("OPENAI_API_KEY", "sk-should-not-be-used")
-    health = handler({"httpMethod": "GET", "path": "/api/health"}, None)
-    assert health["statusCode"] == 200
-    assert '"ai_mode": "demo"' in health["body"]
-    assert os.environ.get("OPENAI_API_KEY") == "sk-should-not-be-used"
-
-    cma = handler(
-        {
-            "httpMethod": "POST",
-            "path": "/.netlify/functions/api/cma",
-            "body": '{"address":"456 Oak Avenue","comps":[{"address":"100 Maple St","price":635000,"sqft":2350,"beds":4,"baths":3,"sold_date":"2025-05-15"}]}',
-        },
-        None,
-    )
-    assert cma["statusCode"] == 200
-    assert "data:application/pdf;base64," in cma["body"]
+def test_hosted_demo_function_is_javascript():
+    """Netlify no longer deploys Python functions, so the public /api is JavaScript."""
+    root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+    source = open(os.path.join(root, "netlify", "functions", "api.mjs"), encoding="utf-8").read()
+    assert "export default" in source
+    assert 'path: "/api/*"' in source
+    assert not os.path.exists(os.path.join(root, "netlify", "functions", "api.py"))
 
 
 def test_normalize_path_accepts_function_splat():
@@ -149,8 +134,6 @@ def test_normalize_path_accepts_function_splat():
     assert normalize_path("/api/health/") == "/api/health"
 
 
-def test_handler_rejects_bad_json():
+def test_handler_rejects_bad_listing_payload():
     result = handle_api("POST", "/api/listing-writer", {})
     assert result.status == 422
-    response = handler({"httpMethod": "POST", "path": "/api/email", "body": "{"}, None)
-    assert response["statusCode"] == 400
