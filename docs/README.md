@@ -1,6 +1,10 @@
-# Real Estate AI — Business-in-a-Box
+# KeyProse
 
-> **5 AI-powered tools for real estate professionals.** Generate MLS listings, CMA reports, social posts, email campaigns, and outreach sequences — in seconds, not hours.
+> **KeyProse: the AI back office for listing agents.** 5 AI-powered tools for real estate professionals. Generate MLS listings, CMA reports, social posts, email campaigns, and outreach sequences — in seconds, not hours.
+
+The Git repository is still named `listing-pilot`. API routes and environment variables are unchanged.
+
+Planned domains, not registered and not configured in this app: `keyprose.com` and `keyprose.app`. There is no canonical URL setting. After one is purchased, point it at the host and set CORS `allow_origins` in `backend/server.py`. Do not hardcode the domain.
 
 [![CI](https://github.com/YOUR_USERNAME/listing-pilot/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_USERNAME/listing-pilot/actions)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://python.org)
@@ -99,8 +103,8 @@ CMD ["python", "backend/server.py"]
 
 ```bash
 # Build and run
-docker build -t listing-pilot .
-docker run -p 8000:8000 -e OPENAI_API_KEY=sk-... listing-pilot
+docker build -t keyprose .
+docker run -p 8000:8000 -e OPENAI_API_KEY=sk-... keyprose
 ```
 
 ---
@@ -127,6 +131,11 @@ fly launch
 fly secrets set OPENAI_API_KEY=sk-...
 fly deploy
 ```
+
+### Netlify (static preview + demo API)
+`netlify.toml` publishes `frontend/`. That is what removes the production 404, which happens when Netlify publishes the repository root and there is no root `index.html`.
+
+Netlify functions do not run Python. `netlify/functions/api.mjs` answers `/api/*` with a JavaScript demo of the same five endpoints, always in demo mode. For the Python app and optional OpenAI generation, run `python backend/server.py` or the included `Dockerfile` on a Python host.
 
 ---
 

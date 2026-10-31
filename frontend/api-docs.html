@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>API Docs — KeyProse</title>
+  <meta name="description" content="KeyProse: the AI back office for listing agents" />
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+  <style>
+    :root { --primary:#1e50a0; --bg:#f8fafc; --card:#fff; --text:#1e293b; --muted:#64748b; --border:#e2e8f0; }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:var(--bg); color:var(--text); }
+    nav { background:var(--primary); color:#fff; padding:0.75rem 1.25rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; }
+    nav a { color:#fff; text-decoration:none; font-weight:600; }
+    .nav-links { display:flex; gap:1rem; flex-wrap:wrap; font-size:0.9rem; }
+    header { padding:2.5rem 1.25rem 1rem; max-width:900px; margin:0 auto; }
+    header h1 { font-size:2rem; margin-bottom:0.5rem; }
+    header p { color:var(--muted); line-height:1.6; }
+    main { max-width:900px; margin:0 auto; padding:1rem 1.25rem 3rem; display:grid; gap:1rem; }
+    article { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.25rem 1.4rem; }
+    h2 { font-size:1.05rem; margin-bottom:0.35rem; }
+    .method { display:inline-block; background:#eff6ff; color:var(--primary); font-size:0.75rem; font-weight:800; padding:2px 8px; border-radius:999px; margin-right:0.4rem; }
+    p { color:var(--muted); font-size:0.95rem; }
+    pre { background:#0f172a; color:#e2e8f0; border-radius:8px; padding:0.9rem 1rem; overflow:auto; margin-top:0.8rem; font-size:0.82rem; }
+    .note { background:#fef3c7; border:1px solid #fcd34d; color:#92400e; border-radius:8px; padding:0.8rem 1rem; font-size:0.9rem; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/" style="display:inline-flex;align-items:center;gap:8px;"><img src="/assets/favicon.svg" alt="" width="28" height="28" /> KeyProse</a>
+    <div class="nav-links">
+      <a href="/tools/listing">Listings</a>
+      <a href="/tools/cma">CMA</a>
+      <a href="/tools/social">Social</a>
+      <a href="/tools/email">Email</a>
+      <a href="/tools/outreach">Outreach</a>
+    </div>
+  </nav>
+  <header>
+    <h1>API reference</h1>
+    <p>Five JSON endpoints. This hosted preview runs a JavaScript demo of those endpoints, because Netlify does not run the Python app. A self-hosted server at the same paths uses OpenAI when <code>OPENAI_API_KEY</code> is set, and Swagger lives at <code>/docs</code> there.</p>
+  </header>
+  <main>
+    <div class="note">Demo output is sample copy for a buyer walkthrough. Review it before sending anything to a client. CMA figures are statistics from the comps you submit, not an appraisal.</div>
+
+    <article>
+      <h2><span class="method">GET</span>/api/health</h2>
+      <p>Returns <code>ai_mode</code> of <code>demo</code> or <code>openai</code>.</p>
+    </article>
+    <article>
+      <h2><span class="method">POST</span>/api/listing-writer</h2>
+      <p>MLS description. Body: <code>property_details</code>, <code>tone</code> (luxury, family, investment, casual, professional), <code>length</code> (short, medium, long).</p>
+      <pre>{
+  "property_details": {"address":"123 Maple Street","beds":4,"baths":3,"sqft":2400,"price":650000},
+  "tone": "luxury",
+  "length": "medium"
+}</pre>
+    </article>
+    <article>
+      <h2><span class="method">POST</span>/api/cma</h2>
+      <p>Comparable-sale summary, value range, and a PDF. Response field <code>cma_pdf_url</code> is a download path on the Python server and a PDF data URL on the hosted preview.</p>
+      <pre>{
+  "address": "456 Oak Avenue",
+  "comps": [{"address":"100 Maple St","price":635000,"sqft":2350,"beds":4,"baths":3,"sold_date":"2025-05-15"}]
+}</pre>
+    </article>
+    <article>
+      <h2><span class="method">POST</span>/api/social</h2>
+      <p>Posts for instagram, facebook, twitter, linkedin, or <code>all</code>.</p>
+    </article>
+    <article>
+      <h2><span class="method">POST</span>/api/email</h2>
+      <p>Sequence for buyer, seller, investor, past_client, or cold_lead. <code>num_emails</code> is 1–7.</p>
+    </article>
+    <article>
+      <h2><span class="method">POST</span>/api/outreach</h2>
+      <p>Preview a sequence for a contact list. Templates: new_listing, price_drop, open_house, follow_up, custom.</p>
+    </article>
+    <article>
+      <h2>Run it yourself</h2>
+      <pre>pip install -r backend/requirements.txt
+python backend/server.py
+# http://localhost:8000
+# http://localhost:8000/docs</pre>
+      <p style="margin-top:0.75rem;">Source and the longer reference: <a href="https://github.com/K-Love/listing-pilot/blob/main/docs/API_REFERENCE.md">docs/API_REFERENCE.md</a>.</p>
+    </article>
+  </main>
+</body>
+</html>

@@ -1,4 +1,6 @@
-# API Reference — Real Estate AI
+# API Reference — KeyProse
+
+KeyProse: the AI back office for listing agents. Endpoint paths are unchanged.
 
 Base URL: `http://localhost:8000` (local) or your deployed URL.
 

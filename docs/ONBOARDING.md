@@ -1,6 +1,6 @@
 # Buyer Onboarding Guide
 
-Welcome! This guide walks you through everything you need to launch **Real Estate AI Business-in-a-Box** after purchase.
+Welcome! This guide walks you through everything you need to launch **KeyProse** after purchase.
 
 ---
 
@@ -115,10 +115,10 @@ Edit the CSS variables in each HTML file:
 ```
 
 ### Update the App Name
-Search and replace "Real Estate AI" across the frontend HTML files.
+Search and replace "KeyProse" across the frontend HTML files. The wordmark is `frontend/assets/logo.svg` and the favicon is `frontend/assets/favicon.svg`.
 
 ### Custom Domain
-Point your domain to your deployment and update CORS settings in `backend/server.py`:
+Point your domain to your deployment and update CORS settings in `backend/server.py`. `keyprose.com` is the planned primary domain and `keyprose.app` is the alternate; neither is registered or set in this repo:
 ```python
 allow_origins=["https://yourdomain.com"]
 ```

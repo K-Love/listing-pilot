@@ -3,14 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CMA Tool — Real Estate AI</title>
+  <title>CMA Tool — KeyProse</title>
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
   <style>
     :root { --primary:#1e50a0; --accent:#f59e0b; --bg:#f8fafc; --card:#fff; --text:#1e293b; --muted:#64748b; --border:#e2e8f0; --radius:12px; }
     * { box-sizing:border-box; margin:0; padding:0; }
     body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:var(--bg); color:var(--text); }
-    nav { background:var(--primary); color:#fff; padding:0 2rem; display:flex; align-items:center; justify-content:space-between; height:60px; }
-    .nav-brand { font-size:1.1rem; font-weight:700; text-decoration:none; color:#fff; }
-    .nav-links a { color:rgba(255,255,255,0.85); text-decoration:none; margin-left:1.5rem; font-size:0.9rem; }
+    nav { background:var(--primary); color:#fff; padding:0.65rem 1.25rem; display:flex; align-items:center; justify-content:space-between; min-height:60px; height:auto; flex-wrap:wrap; gap:0.5rem 1rem; }
+    .nav-brand { font-size:1.1rem; font-weight:700; text-decoration:none; color:#fff; display:inline-flex; align-items:center; gap:8px; }
+    .nav-links { display:flex; flex-wrap:wrap; gap:0.45rem 0.9rem; }
+    .nav-links a { color:rgba(255,255,255,0.85); text-decoration:none; font-size:0.88rem; }
     .page-header { background:linear-gradient(135deg,#166534,#16a34a); color:#fff; padding:2.5rem 2rem; }
     .page-header h1 { font-size:2rem; font-weight:800; }
     .page-header p { opacity:0.85; margin-top:0.5rem; }
@@ -27,9 +29,10 @@
     .btn-success { background:#16a34a; color:#fff; }
     .btn-success:hover { background:#15803d; }
     .btn-sm { padding:0.4rem 0.85rem; font-size:0.85rem; }
-    .comp-row { display:grid; grid-template-columns:2fr 1fr 0.7fr 0.5fr 0.5fr 1fr auto; gap:0.5rem; align-items:center; margin-bottom:0.5rem; }
+    .comp-scroll { overflow-x:auto; }
+    .comp-row { display:grid; grid-template-columns:2fr 1fr 0.7fr 0.5fr 0.5fr 1fr auto; gap:0.5rem; align-items:center; margin-bottom:0.5rem; min-width:720px; }
     .comp-row input { margin-top:0; }
-    .comp-header { display:grid; grid-template-columns:2fr 1fr 0.7fr 0.5fr 0.5fr 1fr auto; gap:0.5rem; margin-bottom:0.35rem; }
+    .comp-header { display:grid; grid-template-columns:2fr 1fr 0.7fr 0.5fr 0.5fr 1fr auto; gap:0.5rem; margin-bottom:0.35rem; min-width:720px; }
     .comp-header span { font-size:0.78rem; font-weight:600; color:var(--muted); }
     .remove-btn { background:none; border:none; color:#dc2626; cursor:pointer; font-size:1.1rem; padding:0.3rem; }
     .result-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1rem; margin-bottom:1.5rem; }
@@ -47,12 +50,14 @@
 <body>
 
 <nav>
-  <a href="/" class="nav-brand">🏠 Real Estate AI</a>
+  <a href="/" class="nav-brand"><img src="/assets/favicon.svg" alt="" width="28" height="28" /> KeyProse</a>
   <div class="nav-links">
-    <a href="/tools/listing">Listing Writer</a>
-    <a href="/tools/cma">CMA Tool</a>
-    <a href="/tools/social">Social Posts</a>
-    <a href="/docs" target="_blank">API Docs</a>
+    <a href="/tools/listing">Listings</a>
+    <a href="/tools/cma">CMA</a>
+    <a href="/tools/social">Social</a>
+    <a href="/tools/email">Email</a>
+    <a href="/tools/outreach">Outreach</a>
+    <a href="/docs">API Docs</a>
   </div>
 </nav>
 
@@ -80,10 +85,12 @@
 
   <div class="card">
     <h2>🔍 Comparable Sales</h2>
+    <div class="comp-scroll">
     <div class="comp-header">
       <span>Address</span><span>Sale Price</span><span>Sq Ft</span><span>Bed</span><span>Bath</span><span>Sold Date</span><span></span>
     </div>
     <div id="comps-container"></div>
+    </div>
     <button class="btn btn-sm" onclick="addComp()" style="margin-top:0.75rem; background:#f1f5f9; border:1.5px solid var(--border); color:var(--text);">+ Add Comp</button>
 
     <div style="margin-top:1.5rem;">
@@ -118,6 +125,8 @@
       </div>
       <h3 style="margin-bottom:0.75rem; font-size:1rem;">Market Analysis Summary</h3>
       <div class="summary-box" id="summary"></div>
+      <a id="pdf-link" class="btn btn-primary" style="display:none; margin-top:1rem; text-decoration:none;" download="cma-report.pdf">Download PDF</a>
+      <p id="form-error" style="display:none; color:#b91c1c; margin-top:0.75rem;"></p>
     </div>
   </div>
 </div>
@@ -173,8 +182,14 @@
   }
 
   async function generateCMA() {
+    const errorEl = document.getElementById('form-error');
+    errorEl.style.display = 'none';
     const comps = getComps();
-    if (comps.length === 0) { alert('Please add at least one comparable sale.'); return; }
+    if (comps.length === 0) {
+      errorEl.textContent = 'Add at least one comparable sale with a price.';
+      errorEl.style.display = 'block';
+      return;
+    }
 
     const payload = {
       address: document.getElementById('address').value || '456 Oak Ave',
@@ -198,10 +213,18 @@
       document.getElementById('range-high').textContent = '$' + data.price_range_high.toLocaleString();
       document.getElementById('ppsf').textContent = data.price_per_sqft ? '$' + data.price_per_sqft.toFixed(0) : 'N/A';
       document.getElementById('summary').textContent = data.cma_summary;
+      const pdf = document.getElementById('pdf-link');
+      if (data.cma_pdf_url) {
+        pdf.href = data.cma_pdf_url;
+        pdf.style.display = 'inline-flex';
+      } else {
+        pdf.style.display = 'none';
+      }
       document.getElementById('results').style.display = 'block';
       document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
     } catch (err) {
-      alert('Error: ' + err.message + '. Make sure the backend is running on port 8000.');
+      errorEl.textContent = err.message + '. The demo API did not respond.';
+      errorEl.style.display = 'block';
     }
   }
 
