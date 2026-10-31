@@ -44,12 +44,16 @@ COMPS = {
 }
 
 
-def test_health_demo_mode():
+def test_health_demo_mode(monkeypatch):
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    monkeypatch.delenv("AI_BASE_URL", raising=False)
     response = client.get("/api/health")
     assert response.status_code == 200
     body = response.json()
     assert body["status"] == "ok"
     assert body["ai_mode"] == "demo"
+    assert body["provider_host"] == "api.openai.com"
+    assert "api_key" not in body
 
 
 def test_homepage_links_every_tool():
@@ -130,6 +134,8 @@ def test_hosted_demo_function_is_javascript():
     source = open(os.path.join(root, "netlify", "functions", "api.mjs"), encoding="utf-8").read()
     assert "export default" in source
     assert 'path: "/api/*"' in source
+    assert "AI_BASE_URL" in source or "readAiConfig" in source
+    assert "chat/completions" in open(os.path.join(root, "netlify", "functions", "ai_provider.mjs"), encoding="utf-8").read()
     assert not os.path.exists(os.path.join(root, "netlify", "functions", "api.py"))
 
 

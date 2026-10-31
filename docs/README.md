@@ -42,7 +42,7 @@ export OPENAI_API_KEY=sk-your-key-here
 python backend/server.py
 ```
 
-The server auto-detects the key and switches from demo mode to live OpenAI generation.
+The server auto-detects the key and switches from demo mode to live generation. `AI_BASE_URL` points at any OpenAI-compatible Chat Completions API (default `https://api.openai.com/v1`). See [Live AI providers](#live-ai-providers) for Abacus.AI RouteLLM and OpenAI.
 
 ---
 
@@ -132,10 +132,12 @@ fly secrets set OPENAI_API_KEY=sk-...
 fly deploy
 ```
 
-### Netlify (static preview + demo API)
+### Netlify (static site + `/api`)
 `netlify.toml` publishes `frontend/`. That is what removes the production 404, which happens when Netlify publishes the repository root and there is no root `index.html`.
 
-Netlify functions do not run Python. `netlify/functions/api.mjs` answers `/api/*` with a JavaScript demo of the same five endpoints, always in demo mode. For the Python app and optional OpenAI generation, run `python backend/server.py` or the included `Dockerfile` on a Python host.
+Netlify functions do not run Python. `netlify/functions/api.mjs` answers `/api/*` with the same five tools. When `OPENAI_API_KEY` is set in **Site configuration → Environment variables**, generations call the Chat Completions URL from `AI_BASE_URL`. When the key is missing, the call fails, the input is too long, or a rate limit is hit, the function returns the built-in sample copy and says so. Do not put the key in the repo.
+
+Stock outreach templates (`new_listing`, `price_drop`, `open_house`, `follow_up`) stay on the built-in sequence, matching `backend/ai/outreach_engine.py`. The `custom` template is the one that calls the model.
 
 ---
 
@@ -153,12 +155,49 @@ All tests run in offline/demo mode — no API key required.
 
 ## ⚙️ Configuration
 
+Set these in the shell for `python backend/server.py`, or in Netlify under **Site configuration → Environment variables** (all scopes you deploy). Never commit the key.
+
 | Environment Variable | Default | Description |
 |---------------------|---------|-------------|
-| `OPENAI_API_KEY` | *(none)* | Enables live AI generation |
-| `OPENAI_MODEL` | `gpt-4o-mini` | OpenAI model to use |
-| `PORT` | `8000` | Server port |
-| `PDF_OUTPUT_DIR` | `/tmp` | CMA PDF output directory |
+| `OPENAI_API_KEY` | *(none)* | API key for live generation. The name stays `OPENAI_API_KEY` for Abacus too; only the value changes. |
+| `AI_BASE_URL` | `https://api.openai.com/v1` | OpenAI-compatible API root. The client calls `{AI_BASE_URL}/chat/completions`. |
+| `AI_MODEL` | *(falls through)* | Model id. Wins over `OPENAI_MODEL` when both are set. |
+| `OPENAI_MODEL` | `gpt-4o-mini` | Model id used when `AI_MODEL` is unset. |
+| `AI_RATE_LIMIT_PER_HOUR` | `10` | Hosted site only. Live generations per IP per hour. `0` disables this cap. |
+| `AI_DAILY_CAP` | `200` | Hosted site only. Live generations per UTC day, shared via Netlify Blobs. `0` disables this cap. |
+| `AI_MAX_INPUT_CHARS` | `8000` | Largest prompt sent to the model. Over the cap, the response is sample copy. `0` disables. |
+| `AI_MAX_TOKENS` | `800` | Upper bound on `max_tokens` sent to the provider. |
+| `AI_MAX_BODY_CHARS` | `24000` | Hosted site only. Larger request bodies are rejected. `0` disables. |
+| `PORT` | `8000` | Python server port |
+| `PDF_OUTPUT_DIR` | `/tmp` | CMA PDF output directory for the Python server |
+
+`GET /api/health` returns `ai_mode` of `live` or `demo` and `provider_host` (hostname only). It never returns the key. Tool responses include `ai_mode` for that result (`live` only when the model produced it) and `notice` when sample copy was used instead.
+
+## Live AI providers
+
+Abacus.AI RouteLLM **is** OpenAI-compatible for this app. The Chat Completions endpoint is documented as a drop-in for the OpenAI SDK: [OpenAI Chat Completions API](https://abacus.ai/help/developer-platform/route-llm/chat-completions/) and [RouteLLM API reference](https://abacus.ai/help/developer-platform/route-llm/).
+
+**Abacus self-serve** (Site configuration → Environment variables):
+
+| Variable | Value |
+|----------|--------|
+| `OPENAI_API_KEY` | RouteLLM API key from the Abacus.AI platform |
+| `AI_BASE_URL` | `https://routellm.abacus.ai/v1` |
+| `AI_MODEL` | `route-llm` |
+
+`route-llm` is the documented router and the default model id on that endpoint. The same docs list explicit model ids (`gpt-4o-mini`, `gpt-5.4`, `claude-sonnet-4-6`, and others). Those tables change, and the Chat Completions page says a human-readable name can differ from the API id (their example is `flux-2-pro` vs `flux2_pro`). Confirm an explicit id with `GET https://routellm.abacus.ai/v1/models` before setting `AI_MODEL` to anything other than `route-llm`.
+
+Enterprise Platform uses a workspace host instead of the self-serve host: `https://<workspace>.abacus.ai/v1` (replace `<workspace>` with the id shown on the RouteLLM API page in that workspace). Same key header: `Authorization: Bearer <your_api_key>`.
+
+**OpenAI** ([Create chat completion](https://developers.openai.com/api/reference/resources/chat/subresources/completions/methods/create/)):
+
+| Variable | Value |
+|----------|--------|
+| `OPENAI_API_KEY` | OpenAI API key |
+| `AI_BASE_URL` | `https://api.openai.com/v1` (optional; this is the default) |
+| `OPENAI_MODEL` or `AI_MODEL` | `gpt-4o-mini` if unset |
+
+The code default remains `gpt-4o-mini`, which that reference still accepts on `POST https://api.openai.com/v1/chat/completions`. The model page ([GPT-4o mini](https://developers.openai.com/api/docs/models/gpt-4o-mini)) currently marks `gpt-4o-mini` as deprecated while still listing Chat Completions as supported. Set `OPENAI_MODEL` or `AI_MODEL` to a current Chat Completions model id if you do not want the default.
 
 ---
 

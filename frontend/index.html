@@ -97,7 +97,7 @@
     <a href="/tools/email">Email</a>
     <a href="/tools/outreach">Outreach</a>
     <a href="/docs">API Docs</a>
-    <span class="demo-badge">DEMO MODE</span>
+    <span class="ai-mode-badge is-demo" id="site-mode-badge">Demo output</span>
   </div>
 </nav>
 
@@ -121,7 +121,7 @@
 <div class="section">
   <div class="demo-banner">
     <span>⚡</span>
-    <p><strong>Demo mode</strong> — these pages call the included generator, with no API key. Self-host and set <code>OPENAI_API_KEY</code> when you want live model output. Listing copy and CMA figures are samples for review, not an appraisal.</p>
+    <p id="site-mode-text"><strong>Sample copy</strong> is used when no model key is configured, or when a live call is limited or fails. Listing copy and CMA figures are for review, not an appraisal.</p>
     <label class="toggle"><input type="checkbox" checked disabled><span class="slider"></span></label>
   </div>
 
@@ -181,7 +181,7 @@
       <div class="feature"><span class="feature-icon">🔌</span><div><h4>Plug-in AI</h4><p>Works offline with demo data. Add OpenAI key to go live instantly.</p></div></div>
       <div class="feature"><span class="feature-icon">📄</span><div><h4>PDF Reports</h4><p>CMA runs produce a downloadable PDF from the comps you enter. Review the numbers before sharing them.</p></div></div>
       <div class="feature"><span class="feature-icon">🐳</span><div><h4>Docker Ready</h4><p>A Dockerfile runs the API and these pages together. Railway, Render, Fly.io, or a VPS can host that image.</p></div></div>
-      <div class="feature"><span class="feature-icon">⚡</span><div><h4>Offline Demo Mode</h4><p>Every tool answers without an API key. Add an OpenAI key on your own host when you want live copy.</p></div></div>
+      <div class="feature"><span class="feature-icon">⚡</span><div><h4>Offline Demo Mode</h4><p>Every tool answers without an API key. Add a key on Netlify or your own host when you want live copy.</p></div></div>
       <div class="feature"><span class="feature-icon">🧪</span><div><h4>Full Test Suite</h4><p>Pytest coverage for all AI modules. CI/CD pipeline included via GitHub Actions.</p></div></div>
       <div class="feature"><span class="feature-icon">📚</span><div><h4>Complete Docs</h4><p>API reference, onboarding guide, demo script, and buyer handoff instructions.</p></div></div>
     </div>
@@ -192,5 +192,16 @@
   <p>KeyProse &mdash; <a href="/docs">API Docs</a> &middot; <a href="https://github.com/K-Love/listing-pilot" target="_blank" rel="noopener">GitHub</a></p>
   <p style="margin-top:0.5rem; font-size:0.8rem;">Demo software for review. No customer list or revenue is represented here. Built with FastAPI.</p>
 </footer>
+<script src="/assets/ai-mode.js"></script>
+<script>
+  fetch("/api/health").then(function (response) { return response.json(); }).then(function (data) {
+    if (!window.KeyProse) return;
+    KeyProse.applyBadge(document.getElementById("site-mode-badge"), data);
+    var text = document.getElementById("site-mode-text");
+    if (data.ai_mode === "live" && text) {
+      text.innerHTML = "<strong>Live AI</strong> is on for this site. If a generation is limited or the model call fails, you still get sample copy. Listing copy and CMA figures are for review, not an appraisal.";
+    }
+  }).catch(function () {});
+</script>
 </body>
 </html>

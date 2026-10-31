@@ -1,8 +1,12 @@
-# Publish the static UI. Netlify functions are JavaScript-only, so /api/*
-# is a demo implementation of the same endpoints as `python backend/server.py`.
-# Self-host that Python app, or the Dockerfile, for OpenAI-backed generation.
+# Publish the static UI. /api/* is netlify/functions/api.mjs: sample copy, or a
+# live Chat Completions call when OPENAI_API_KEY is set. The Python app in
+# backend/server.py uses the same AI_BASE_URL / model variables.
 [build]
   publish = "frontend"
+
+# Live completions need longer than the 10s default. 26s is the sync maximum.
+[functions.api]
+  timeout = 26
 
 [[redirects]]
   from = "/docs"

@@ -71,7 +71,7 @@
   <!-- Form -->
   <div class="card">
     <h2>🏡 Property Info</h2>
-    <div class="demo-note">⚡ <strong>Demo Mode</strong> — Click "Load Sample" to prefill.</div>
+    <div class="demo-note">Click "Load Sample" to prefill.</div>
 
     <label>Property ID / Address</label>
     <input type="text" id="property_id" placeholder="123-maple-st-austin" />
@@ -120,7 +120,8 @@
 
   <!-- Results -->
   <div class="card">
-    <h2>📲 Generated Posts</h2>
+    <h2>📲 Generated Posts <span class="ai-mode-badge is-demo" id="aiBadge" hidden>Demo output</span></h2>
+    <p class="ai-mode-notice" id="aiNotice" hidden></p>
     <div id="posts-container">
       <div class="empty-state">
         <div class="icon">📱</div>
@@ -131,6 +132,7 @@
   </div>
 </div>
 
+<script src="/assets/ai-mode.js"></script>
 <script>
   const PLATFORM_ICONS = { instagram:'📸', facebook:'👥', twitter:'🐦', linkedin:'💼' };
   const PLATFORM_COLORS = { instagram:'#e1306c', facebook:'#1877f2', twitter:'#1da1f2', linkedin:'#0a66c2' };
@@ -175,6 +177,10 @@
       const data = await res.json();
 
       container.innerHTML = '';
+      if (window.KeyProse) {
+        KeyProse.applyBadge(document.getElementById('aiBadge'), data);
+        KeyProse.applyNotice(document.getElementById('aiNotice'), data);
+      }
       data.posts.forEach(post => {
         const icon = PLATFORM_ICONS[post.platform] || '📱';
         const color = PLATFORM_COLORS[post.platform] || '#64748b';

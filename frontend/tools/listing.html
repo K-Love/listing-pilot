@@ -68,7 +68,7 @@
   <!-- Form -->
   <div class="card">
     <h2>📝 Property Details</h2>
-    <div class="demo-note">⚡ <strong>Demo Mode</strong> — Click "Load Sample" to prefill with example data, or enter your own.</div>
+    <div class="demo-note">Click "Load Sample" to prefill with example data, or enter your own.</div>
 
     <label>Property Address</label>
     <input type="text" id="address" placeholder="123 Maple Street, Austin, TX 78701" />
@@ -139,15 +139,18 @@
       <span class="result-placeholder">Your listing description will appear here...</span>
     </div>
     <div class="meta" id="meta" style="display:none;">
+      <span class="ai-mode-badge is-demo" id="aiBadge" hidden>Demo output</span>
       <span class="meta-badge" id="wordCount"></span>
       <span class="meta-badge" id="toneLabel"></span>
     </div>
+    <p class="ai-mode-notice" id="aiNotice" hidden></p>
     <button class="copy-btn" id="copyBtn" onclick="copyResult()" style="display:none;">
       📋 Copy to Clipboard
     </button>
   </div>
 </div>
 
+<script src="/assets/ai-mode.js"></script>
 <script>
   const API_BASE = '';
 
@@ -202,6 +205,10 @@
       const data = await res.json();
 
       resultEl.textContent = data.listing_text;
+      if (window.KeyProse) {
+        KeyProse.applyBadge(document.getElementById('aiBadge'), data);
+        KeyProse.applyNotice(document.getElementById('aiNotice'), data);
+      }
       document.getElementById('wordCount').textContent = `${data.word_count || data.listing_text.split(' ').length} words`;
       document.getElementById('toneLabel').textContent = payload.tone.charAt(0).toUpperCase() + payload.tone.slice(1);
       document.getElementById('meta').style.display = 'flex';

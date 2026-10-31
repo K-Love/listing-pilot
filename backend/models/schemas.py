@@ -39,6 +39,8 @@ class ListingRequest(BaseModel):
 class ListingResponse(BaseModel):
     listing_text: str
     word_count: Optional[int] = None
+    ai_mode: str = "demo"
+    notice: Optional[str] = None
 
     def model_post_init(self, __context: Any) -> None:
         if self.word_count is None:
@@ -74,6 +76,8 @@ class CMAResponse(BaseModel):
     price_per_sqft: Optional[float] = None
     cma_pdf_url: Optional[str] = None
     comps_used: int
+    ai_mode: str = "demo"
+    notice: Optional[str] = None
 
 
 # ─── Social Generator ─────────────────────────────────────────────────────────
@@ -112,6 +116,8 @@ class SocialRequest(BaseModel):
 
 class SocialResponse(BaseModel):
     posts: List[SocialPost]
+    ai_mode: str = "demo"
+    notice: Optional[str] = None
 
 
 # ─── Email Generator ──────────────────────────────────────────────────────────
@@ -145,6 +151,8 @@ class EmailRequest(BaseModel):
 
 class EmailResponse(BaseModel):
     emails: List[EmailMessage]
+    ai_mode: str = "demo"
+    notice: Optional[str] = None
 
 
 # ─── Outreach Engine ──────────────────────────────────────────────────────────
@@ -173,3 +181,5 @@ class OutreachResponse(BaseModel):
     total_contacts: int
     sequence_steps: int
     estimated_send_days: int
+    ai_mode: str = "demo"
+    notice: Optional[str] = None

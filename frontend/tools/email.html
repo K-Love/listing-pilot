@@ -58,7 +58,7 @@
 <div class="container">
   <div class="card">
     <h2>Audience</h2>
-    <div class="demo-note">⚡ <strong>Demo mode</strong> — sample copy from the included templates. Review before you send it.</div>
+    <div class="demo-note">Review the copy before you send it.</div>
     <label>Recipient type</label>
     <select id="recipient_type">
       <option value="buyer">Buyer</option>
@@ -84,10 +84,12 @@
     <p class="error" id="error" hidden></p>
   </div>
   <div class="card">
-    <h2>Sequence</h2>
+    <h2>Sequence <span class="ai-mode-badge is-demo" id="aiBadge" hidden>Demo output</span></h2>
+    <p class="ai-mode-notice" id="aiNotice" hidden></p>
     <div id="results"><p class="placeholder">Generated emails will appear here.</p></div>
   </div>
 </div>
+<script src="/assets/ai-mode.js"></script>
 <script>
   function loadSample() {
     document.getElementById('recipient_type').value = 'buyer';
@@ -130,6 +132,10 @@
       });
       if (!res.ok) throw new Error('API error ' + res.status);
       const data = await res.json();
+      if (window.KeyProse) {
+        KeyProse.applyBadge(document.getElementById('aiBadge'), data);
+        KeyProse.applyNotice(document.getElementById('aiNotice'), data);
+      }
       results.innerHTML = '';
       (data.emails || []).forEach(email => {
         const card = document.createElement('article');

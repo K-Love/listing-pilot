@@ -1,10 +1,30 @@
 /**
- * Hosted demo API. Netlify functions support JavaScript, not Python, so this
- * file mirrors the offline generators in backend/ai. Self-hosting still uses
- * backend/server.py, including the OpenAI path.
+ * Hosted API. Netlify functions support JavaScript, not Python, so this file
+ * mirrors the offline generators in backend/ai and, when OPENAI_API_KEY is
+ * set, calls the same Chat Completions prompts. A failed or limited call
+ * falls back to the canned output. Self-hosting still uses backend/server.py.
  */
 
 import { createHash } from "node:crypto";
+import {
+  chatText,
+  clientIp,
+  cmaPrompt,
+  emailPlans,
+  listingPrompt,
+  listingSystem,
+  maxBodyChars,
+  outreachPrompt,
+  parseEmailDraft,
+  readAiConfig,
+  reserveGeneration,
+  resetLimitsForTests,
+  socialPlans,
+  useMemoryLimitsForTests,
+  PARTIAL_NOTICE,
+} from "./ai_provider.mjs";
+
+export { resetLimitsForTests, useMemoryLimitsForTests };
 
 const JSON_HEADERS = {
   "content-type": "application/json; charset=utf-8",
@@ -104,13 +124,16 @@ function roundTo(value, nearest) {
   return Math.round(value / nearest) * nearest;
 }
 
-function cmaReport(address, comps) {
+function cmaReport(address, comps, summaryOverride) {
   const stats = cmaStats(comps);
   const estimated = stats.median || stats.mean;
   const count = comps.length;
-  let summary = `Based on ${count} comparable sale${count === 1 ? "" : "s"} in the subject area, the estimated market value for ${address} is $${money(roundTo(estimated, 1000))}. Recent comparable sales ranged from $${money(roundTo(stats.low, 1000))} to $${money(roundTo(stats.high, 1000))}, with a median sale price of $${money(roundTo(stats.median, 1))}. `;
-  if (stats.ppsf > 0) summary += `The average price per square foot among comps is $${stats.ppsf.toFixed(2)}. `;
-  summary += "Current market conditions suggest moderate buyer demand with limited inventory, supporting pricing at or slightly above the median comparable. We recommend listing within the suggested range and reviewing after 14 days on market.";
+  let summary = summaryOverride;
+  if (!summary) {
+    summary = `Based on ${count} comparable sale${count === 1 ? "" : "s"} in the subject area, the estimated market value for ${address} is $${money(roundTo(estimated, 1000))}. Recent comparable sales ranged from $${money(roundTo(stats.low, 1000))} to $${money(roundTo(stats.high, 1000))}, with a median sale price of $${money(roundTo(stats.median, 1))}. `;
+    if (stats.ppsf > 0) summary += `The average price per square foot among comps is $${stats.ppsf.toFixed(2)}. `;
+    summary += "Current market conditions suggest moderate buyer demand with limited inventory, supporting pricing at or slightly above the median comparable. We recommend listing within the suggested range and reviewing after 14 days on market.";
+  }
   return {
     cma_summary: summary,
     estimated_value: roundTo(estimated, 1000),
@@ -324,8 +347,64 @@ function outreach(contacts, template, customMessage) {
 
 async function readJson(req) {
   const raw = await req.text();
+  if (raw.length > maxBodyChars()) {
+    const error = new Error("body-too-large");
+    error.code = "BODY_TOO_LARGE";
+    throw error;
+  }
   if (!raw) return {};
   return JSON.parse(raw);
+}
+
+function wordCount(text) {
+  return String(text).split(/\s+/).filter(Boolean).length;
+}
+
+function withMode(payload, live) {
+  const body = { ...payload, ai_mode: live.ok ? "live" : "demo" };
+  if (live.notice) body.notice = live.notice;
+  return body;
+}
+
+async function runLive(req, task) {
+  const config = readAiConfig();
+  if (!config.configured) return { ok: false };
+  if (!config.callable) {
+    return { ok: false, notice: "The model endpoint is not configured, so this is sample output." };
+  }
+  const slot = await reserveGeneration(clientIp(req));
+  if (!slot.ok) return { ok: false, notice: slot.notice };
+  try {
+    const text = await task();
+    if (!text || !String(text).trim()) {
+      return { ok: false, notice: "The model call failed, so this is sample output." };
+    }
+    return { ok: true, text: String(text).trim() };
+  } catch (error) {
+    console.error(`[api] model call failed (${error && error.notice ? error.notice : "request failed"}); using demo output`);
+    return { ok: false, notice: (error && error.notice) || "The model call failed, so this is sample output." };
+  }
+}
+
+async function runLiveMany(req, tasks) {
+  const config = readAiConfig();
+  if (!config.configured) return { mode: "skip" };
+  if (!config.callable) {
+    return { mode: "limited", notice: "The model endpoint is not configured, so this is sample output." };
+  }
+  const slot = await reserveGeneration(clientIp(req));
+  if (!slot.ok) return { mode: "limited", notice: slot.notice };
+  const results = await Promise.all(tasks.map(async (task) => {
+    try {
+      const text = await task();
+      if (!text || !String(text).trim()) return { ok: false };
+      return { ok: true, text: String(text).trim() };
+    } catch (error) {
+      console.error("[api] model call failed; using demo output for that piece");
+      return { ok: false, notice: (error && error.notice) || "The model call failed, so this is sample output." };
+    }
+  }));
+  return { mode: "called", results };
 }
 
 export default async function handler(req) {
@@ -333,7 +412,14 @@ export default async function handler(req) {
   const path = routeOf(req);
   try {
     if (req.method === "GET" && path === "/api/health") {
-      return json(200, { status: "ok", version: "1.0.0", ai_mode: "demo", host: "netlify" });
+      const config = readAiConfig();
+      return json(200, {
+        status: "ok",
+        version: "1.0.0",
+        ai_mode: config.configured ? "live" : "demo",
+        host: "netlify",
+        provider_host: config.providerHost,
+      });
     }
     const payload = req.method === "POST" ? await readJson(req) : {};
 
@@ -341,42 +427,134 @@ export default async function handler(req) {
       if (!payload.property_details || typeof payload.property_details !== "object") {
         return json(422, { detail: "property_details is required" });
       }
-      const listing_text = listingText(payload.property_details, payload.tone || "professional", payload.length || "medium");
-      return json(200, { listing_text, word_count: listing_text.split(/\s+/).filter(Boolean).length });
+      const tone = payload.tone || "professional";
+      const length = payload.length || "medium";
+      const demoText = listingText(payload.property_details, tone, length);
+      const live = await runLive(req, () => chatText({
+        prompt: listingPrompt(payload.property_details, tone, length),
+        system: listingSystem(),
+        maxTokens: 600,
+      }));
+      const listing_text = live.ok ? live.text : demoText;
+      return json(200, withMode({ listing_text, word_count: wordCount(listing_text) }, live));
     }
 
     if (req.method === "POST" && path === "/api/cma") {
       if (!payload.address || !Array.isArray(payload.comps) || payload.comps.length === 0) {
         return json(422, { detail: "address and at least one comp are required" });
       }
-      return json(200, cmaReport(payload.address, payload.comps));
+      const demo = cmaReport(payload.address, payload.comps);
+      const live = await runLive(req, () => chatText({
+        prompt: cmaPrompt(payload.address, payload.comps, cmaStats(payload.comps)),
+        maxTokens: 400,
+      }));
+      const report = live.ok ? cmaReport(payload.address, payload.comps, live.text) : demo;
+      return json(200, withMode(report, live));
     }
 
     if (req.method === "POST" && path === "/api/social") {
       if (!payload.property_id) return json(422, { detail: "property_id is required" });
-      return json(200, {
-        posts: socialPosts(payload.property_id, payload.tone || "excited", payload.platform || "all", payload.property_details),
+      const tone = payload.tone || "excited";
+      const platform = payload.platform || "all";
+      const demoPosts = socialPosts(payload.property_id, tone, platform, payload.property_details);
+      const plans = socialPlans(payload.property_id, tone, platform, payload.property_details || {
+        address: payload.property_id,
+        beds: 3,
+        baths: 2,
+        sqft: 1800,
+        price: 550000,
+        highlight: "Open floor plan, updated kitchen, large backyard",
       });
+      const live = await runLiveMany(req, plans.map((plan) => () => chatText({
+        prompt: plan.prompt,
+        maxTokens: plan.maxTokens,
+      })));
+      if (live.mode !== "called") {
+        return json(200, withMode({ posts: demoPosts }, { ok: false, notice: live.notice }));
+      }
+      const failed = live.results.filter((result) => !result.ok).length;
+      if (failed === live.results.length) {
+        return json(200, withMode({ posts: demoPosts }, { ok: false, notice: live.results[0]?.notice }));
+      }
+      const posts = live.results.map((result, index) => {
+        if (!result.ok) return demoPosts[index] || demoPosts[0];
+        return {
+          platform: plans[index].platform,
+          content: result.text,
+          hashtags: plans[index].hashtags,
+          character_count: result.text.length,
+        };
+      });
+      const notice = failed ? PARTIAL_NOTICE : undefined;
+      return json(200, withMode({ posts }, { ok: true, notice }));
     }
 
     if (req.method === "POST" && path === "/api/email") {
       if (!payload.recipient_type || !payload.context || typeof payload.context !== "object") {
         return json(422, { detail: "recipient_type and context are required" });
       }
-      return json(200, { emails: emailsFor(payload.recipient_type, payload.context, payload.num_emails) });
+      const demoEmails = emailsFor(payload.recipient_type, payload.context, payload.num_emails);
+      const plans = emailPlans(payload.recipient_type, payload.context, payload.num_emails);
+      const live = await runLiveMany(req, plans.map((plan) => () => chatText({
+        prompt: plan.prompt,
+        maxTokens: plan.maxTokens,
+      })));
+      if (live.mode !== "called") {
+        return json(200, withMode({ emails: demoEmails }, { ok: false, notice: live.notice }));
+      }
+      const failed = live.results.filter((result) => !result.ok).length;
+      if (failed === live.results.length) {
+        return json(200, withMode({ emails: demoEmails }, { ok: false, notice: live.results[0]?.notice }));
+      }
+      const emails = live.results.map((result, index) => {
+        const plan = plans[index];
+        if (!result.ok) {
+          return demoEmails[index] || {
+            subject: `Follow-up #${plan.step}`,
+            body: demoEmails[0]?.body || "",
+            recipient_type: payload.recipient_type,
+            sequence_step: plan.step,
+            send_delay_days: plan.delay,
+          };
+        }
+        const draft = parseEmailDraft(result.text, plan.step);
+        return {
+          subject: draft.subject,
+          body: draft.body,
+          recipient_type: payload.recipient_type,
+          sequence_step: plan.step,
+          send_delay_days: plan.delay,
+        };
+      });
+      const notice = failed ? PARTIAL_NOTICE : undefined;
+      return json(200, withMode({ emails }, { ok: true, notice }));
     }
 
     if (req.method === "POST" && path === "/api/outreach") {
       if (!Array.isArray(payload.target_list) || payload.target_list.length === 0) {
         return json(422, { detail: "target_list is required" });
       }
-      return json(200, outreach(payload.target_list, payload.sequence_template || "new_listing", payload.custom_message));
+      const template = payload.sequence_template || "new_listing";
+      const demo = outreach(payload.target_list, template, payload.custom_message);
+      const key = String(template).toLowerCase();
+      if (key !== "custom") {
+        return json(200, { ...demo, ai_mode: "demo" });
+      }
+      const live = await runLive(req, () => chatText({
+        prompt: outreachPrompt(payload.target_list, template, payload.custom_message, demo.sequence_steps),
+        maxTokens: 400,
+      }));
+      if (!live.ok) return json(200, withMode(demo, live));
+      return json(200, withMode({ ...demo, preview: live.text }, live));
     }
 
     return json(404, { detail: "Not found" });
   } catch (error) {
     if (error instanceof SyntaxError) return json(400, { detail: "Invalid JSON" });
-    return json(500, { detail: error.message || "Demo API error" });
+    if (error && error.code === "BODY_TOO_LARGE") {
+      return json(413, { detail: "That request is too large. Shorten it and try again." });
+    }
+    return json(500, { detail: "Request failed" });
   }
 }
 

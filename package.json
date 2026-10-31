@@ -1,0 +1,8 @@
+{
+  "name": "keyprose",
+  "private": true,
+  "description": "KeyProse hosted function dependencies. The API key is not stored here.",
+  "dependencies": {
+    "@netlify/blobs": "11.1.7"
+  }
+}

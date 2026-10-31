@@ -56,7 +56,7 @@
 <div class="container">
   <div class="card">
     <h2>Contacts</h2>
-    <div class="demo-note">⚡ <strong>Demo mode</strong> — you get a sequence preview, not a live send.</div>
+    <div class="demo-note">You get a sequence preview, not a live send. Built-in templates stay as written; a custom template can use the model.</div>
     <label>Sequence</label>
     <select id="template">
       <option value="new_listing">New listing</option>
@@ -75,10 +75,12 @@
     <p class="error" id="error" hidden></p>
   </div>
   <div class="card">
-    <h2>Preview</h2>
+    <h2>Preview <span class="ai-mode-badge is-demo" id="aiBadge" hidden>Demo output</span></h2>
+    <p class="ai-mode-notice" id="aiNotice" hidden></p>
     <div id="results"><p class="placeholder">The sequence preview will appear here. Nothing is delivered.</p></div>
   </div>
 </div>
+<script src="/assets/ai-mode.js"></script>
 <script>
   function loadSample() {
     document.getElementById('template').value = 'new_listing';
@@ -118,6 +120,10 @@
       });
       if (!res.ok) throw new Error('API error ' + res.status);
       const data = await res.json();
+      if (window.KeyProse) {
+        KeyProse.applyBadge(document.getElementById('aiBadge'), data);
+        KeyProse.applyNotice(document.getElementById('aiNotice'), data);
+      }
       results.innerHTML = '';
       const stats = document.createElement('div');
       stats.className = 'stats';

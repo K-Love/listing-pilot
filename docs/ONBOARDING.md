@@ -40,8 +40,10 @@ python backend/server.py
    ```
 3. Restart the server — it auto-detects the key.
 
-**Recommended model:** `gpt-4o-mini` (fast, cheap, excellent quality)
-**Cost estimate:** ~$0.001–0.005 per listing generation
+For Abacus.AI RouteLLM or another OpenAI-compatible host, also set `AI_BASE_URL` and `AI_MODEL`. The Netlify site reads the same variables under **Site configuration → Environment variables**. Exact values and doc links are in the [README](README.md#live-ai-providers).
+
+**Default model:** `gpt-4o-mini` (override with `OPENAI_MODEL` or `AI_MODEL`)
+**Cost estimate:** ~$0.001–0.005 per listing generation on that default model
 
 ---
 
