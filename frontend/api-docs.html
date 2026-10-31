@@ -38,14 +38,14 @@
   </nav>
   <header>
     <h1>API reference</h1>
-    <p>Five JSON endpoints. This hosted preview runs a JavaScript demo of those endpoints, because Netlify does not run the Python app. A self-hosted server at the same paths uses OpenAI when <code>OPENAI_API_KEY</code> is set, and Swagger lives at <code>/docs</code> there.</p>
+    <p>Five JSON endpoints. This hosted site runs them in JavaScript. With <code>OPENAI_API_KEY</code> set it calls an OpenAI-compatible Chat Completions API; otherwise, or if that call fails, it returns sample copy. A self-hosted Python server uses the same paths, and Swagger lives at <code>/docs</code> there.</p>
   </header>
   <main>
     <div class="note">Demo output is sample copy for a buyer walkthrough. Review it before sending anything to a client. CMA figures are statistics from the comps you submit, not an appraisal.</div>
 
     <article>
       <h2><span class="method">GET</span>/api/health</h2>
-      <p>Returns <code>ai_mode</code> of <code>demo</code> or <code>openai</code>.</p>
+      <p>Returns <code>ai_mode</code> of <code>live</code> or <code>demo</code>, plus <code>provider_host</code> (the API hostname only, never the key).</p>
     </article>
     <article>
       <h2><span class="method">POST</span>/api/listing-writer</h2>

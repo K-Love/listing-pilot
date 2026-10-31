@@ -28,9 +28,12 @@ Health check.
 {
   "status": "ok",
   "version": "1.0.0",
-  "ai_mode": "demo"
+  "ai_mode": "demo",
+  "provider_host": "api.openai.com"
 }
 ```
+
+`ai_mode` is `live` when `OPENAI_API_KEY` is set, and `demo` otherwise. `provider_host` is the hostname of `AI_BASE_URL`. The key is never included. The hosted function also returns `host: "netlify"`. Tool responses add `ai_mode` (`live` only for text the model actually returned) and, when sample copy was substituted, a `notice`.
 
 ---
 
@@ -287,4 +290,4 @@ All endpoints return standard HTTP error codes:
 
 ## Rate Limits
 
-No rate limits in demo mode. When using OpenAI, limits are governed by your OpenAI plan.
+Demo responses are not rate limited. On the hosted site, live generations default to 10 per IP per hour (`AI_RATE_LIMIT_PER_HOUR`) and 200 per UTC day (`AI_DAILY_CAP`, stored in Netlify Blobs). Over a limit, the response is sample copy plus a `notice`. Provider quotas still apply to successful live calls.

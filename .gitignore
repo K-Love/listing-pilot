@@ -64,5 +64,8 @@ release/listing-pilot.zip
 # Logs
 *.log
 
+# Node (Netlify Blobs client for the hosted rate limit)
+node_modules/
+
 # Built into the Netlify function during deploy
 netlify/functions/vendor/

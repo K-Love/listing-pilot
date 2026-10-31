@@ -29,6 +29,7 @@ from ai.email_generator import generate_emails
 from ai.listing_writer import generate_listing
 from ai.outreach_engine import generate_outreach
 from ai.social_generator import generate_social_posts
+from services.ai_client import begin_generation, generation_mode, generation_notice, live_enabled, provider_host
 
 
 class ApiResult:
@@ -58,9 +59,18 @@ def normalize_path(path: str) -> str:
     return path or "/"
 
 
+def _with_meta(body: dict) -> dict:
+    body["ai_mode"] = generation_mode()
+    notice = generation_notice()
+    if notice:
+        body["notice"] = notice
+    return body
+
+
 def handle_api(method: str, path: str, payload: Optional[Any]) -> ApiResult:
     method = (method or "GET").upper()
     path = normalize_path(path)
+    begin_generation()
 
     if method == "OPTIONS":
         return ApiResult(204, {})
@@ -72,38 +82,39 @@ def handle_api(method: str, path: str, payload: Optional[Any]) -> ApiResult:
                 {
                     "status": "ok",
                     "version": "1.0.0",
-                    "ai_mode": "openai" if os.getenv("OPENAI_API_KEY") else "demo",
+                    "ai_mode": "live" if live_enabled() else "demo",
+                    "provider_host": provider_host(),
                 },
             )
 
         if path == "/api/listing-writer" and method == "POST":
             req = ListingRequest.model_validate(payload or {})
             text = generate_listing(req.property_details, req.tone, req.length)
-            return ApiResult(200, ListingResponse(listing_text=text).model_dump())
+            return ApiResult(200, _with_meta(ListingResponse(listing_text=text).model_dump()))
 
         if path == "/api/cma" and method == "POST":
             req = CMARequest.model_validate(payload or {})
             result = generate_cma(req.address, req.comps)
-            return ApiResult(200, CMAResponse(**result).model_dump())
+            return ApiResult(200, _with_meta(CMAResponse(**result).model_dump()))
 
         if path == "/api/social" and method == "POST":
             req = SocialRequest.model_validate(payload or {})
             posts = generate_social_posts(
                 req.property_id, req.tone, req.platform, req.property_details
             )
-            return ApiResult(200, SocialResponse(posts=posts).model_dump())
+            return ApiResult(200, _with_meta(SocialResponse(posts=posts).model_dump()))
 
         if path == "/api/email" and method == "POST":
             req = EmailRequest.model_validate(payload or {})
             emails = generate_emails(req.recipient_type, req.context, req.num_emails)
-            return ApiResult(200, EmailResponse(emails=emails).model_dump())
+            return ApiResult(200, _with_meta(EmailResponse(emails=emails).model_dump()))
 
         if path == "/api/outreach" and method == "POST":
             req = OutreachRequest.model_validate(payload or {})
             result = generate_outreach(
                 req.target_list, req.sequence_template, req.custom_message
             )
-            return ApiResult(200, OutreachResponse(**result).model_dump())
+            return ApiResult(200, _with_meta(OutreachResponse(**result).model_dump()))
 
         if path.startswith("/api/cma/pdf/") and method == "GET":
             return _read_pdf(path.rsplit("/", 1)[-1])

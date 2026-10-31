@@ -69,7 +69,7 @@
 <div class="container">
   <div class="card">
     <h2>🏠 Subject Property</h2>
-    <div class="demo-note">⚡ <strong>Demo Mode</strong> — Click "Load Sample" to prefill with example data.</div>
+    <div class="demo-note">Click "Load Sample" to prefill with example data. Figures come from the comps you enter and are not an appraisal.</div>
 
     <label>Property Address</label>
     <input type="text" id="address" placeholder="456 Oak Avenue, Austin, TX 78702" />
@@ -100,7 +100,7 @@
 
   <div id="results">
     <div class="card">
-      <h2>📈 Valuation Results</h2>
+      <h2>📈 Valuation Results <span class="ai-mode-badge is-demo" id="aiBadge" hidden>Demo output</span></h2>
       <div class="result-grid">
         <div class="value-card">
           <div class="label">ESTIMATED VALUE</div>
@@ -125,12 +125,14 @@
       </div>
       <h3 style="margin-bottom:0.75rem; font-size:1rem;">Market Analysis Summary</h3>
       <div class="summary-box" id="summary"></div>
+      <p class="ai-mode-notice" id="aiNotice" hidden></p>
       <a id="pdf-link" class="btn btn-primary" style="display:none; margin-top:1rem; text-decoration:none;" download="cma-report.pdf">Download PDF</a>
       <p id="form-error" style="display:none; color:#b91c1c; margin-top:0.75rem;"></p>
     </div>
   </div>
 </div>
 
+<script src="/assets/ai-mode.js"></script>
 <script>
   let compCount = 0;
 
@@ -213,6 +215,10 @@
       document.getElementById('range-high').textContent = '$' + data.price_range_high.toLocaleString();
       document.getElementById('ppsf').textContent = data.price_per_sqft ? '$' + data.price_per_sqft.toFixed(0) : 'N/A';
       document.getElementById('summary').textContent = data.cma_summary;
+      if (window.KeyProse) {
+        KeyProse.applyBadge(document.getElementById('aiBadge'), data);
+        KeyProse.applyNotice(document.getElementById('aiNotice'), data);
+      }
       const pdf = document.getElementById('pdf-link');
       if (data.cma_pdf_url) {
         pdf.href = data.cma_pdf_url;

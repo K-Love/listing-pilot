@@ -113,8 +113,10 @@ fly deploy
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `OPENAI_API_KEY` | No | *(demo mode)* | OpenAI API key for live generation |
-| `OPENAI_MODEL` | No | `gpt-4o-mini` | OpenAI model to use |
+| `OPENAI_API_KEY` | No | *(demo mode)* | API key for live generation (OpenAI or an OpenAI-compatible host such as Abacus RouteLLM) |
+| `AI_BASE_URL` | No | `https://api.openai.com/v1` | Chat Completions API root |
+| `AI_MODEL` | No | *(unset)* | Model id; overrides `OPENAI_MODEL` |
+| `OPENAI_MODEL` | No | `gpt-4o-mini` | Model id when `AI_MODEL` is unset |
 | `PORT` | No | `8000` | Server port |
 | `PDF_OUTPUT_DIR` | No | `/tmp` | Directory for generated PDFs |
 
