@@ -59,6 +59,10 @@ def test_homepage_links_every_tool():
     for path in ("/tools/listing", "/tools/cma", "/tools/social", "/tools/email", "/tools/outreach"):
         assert path in html
     assert "https://github.com/K-Love/listing-pilot" in html
+    assert "KeyProse" in html
+    assert "the AI back office for listing agents" in html
+    assert "Real Estate AI" not in html
+    assert "Business-in-a-Box" not in html
     assert "</html>" in html.lower()
 
 

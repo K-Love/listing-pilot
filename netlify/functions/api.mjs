@@ -119,7 +119,7 @@ function cmaReport(address, comps) {
     price_per_sqft: stats.ppsf ? Math.round(stats.ppsf * 100) / 100 : null,
     comps_used: count,
     cma_pdf_url: `data:application/pdf;base64,${pdfBase64([
-      "Real Estate AI - CMA Report",
+      "KeyProse - CMA Report",
       "Sample report, not an appraisal.",
       "",
       `Subject: ${address}`,

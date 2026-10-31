@@ -1,4 +1,4 @@
--- Real Estate AI Business-in-a-Box — Demo Seed Data
+-- KeyProse — Demo Seed Data
 -- Run with: sqlite3 listing_pilot.db < backend/data/seed_demo_data.sql
 
 CREATE TABLE IF NOT EXISTS properties (

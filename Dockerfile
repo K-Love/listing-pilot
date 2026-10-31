@@ -1,5 +1,8 @@
 FROM python:3.11-slim
 
+LABEL org.opencontainers.image.title="KeyProse"
+LABEL org.opencontainers.image.description="KeyProse: the AI back office for listing agents"
+
 WORKDIR /app
 
 COPY backend/requirements.txt /tmp/requirements.txt

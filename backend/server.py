@@ -1,5 +1,5 @@
 """
-Real Estate AI Business-in-a-Box — FastAPI Server
+KeyProse — FastAPI Server
 Start with: python backend/server.py
 API docs:   http://localhost:8000/docs
 """
@@ -26,10 +26,10 @@ from models.schemas import (
 from demo_http import handle_api
 
 app = FastAPI(
-    title="Real Estate AI Business-in-a-Box",
+    title="KeyProse",
     description=(
-        "AI-powered tools for real estate professionals: "
-        "listing writer, CMA assistant, social media generator, "
+        "KeyProse: the AI back office for listing agents. "
+        "Listing writer, CMA assistant, social media generator, "
         "email campaigns, and outreach automation."
     ),
     version="1.0.0",

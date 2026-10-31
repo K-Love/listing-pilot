@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Real Estate AI — Business-in-a-Box</title>
+  <title>KeyProse</title>
+  <meta name="description" content="KeyProse: the AI back office for listing agents" />
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
   <style>
     :root {
       --primary: #1e50a0;
@@ -23,7 +25,8 @@
     /* Nav */
     nav { background: var(--primary); color: #fff; padding: 0.65rem 1.25rem; display: flex; align-items: center; justify-content: space-between; min-height: 60px; height: auto; flex-wrap: wrap; gap: 0.6rem 1rem; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
     .nav-brand { font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; gap: 10px; }
-    .nav-brand svg { width: 32px; height: 32px; }
+    .nav-brand img, .nav-brand svg { width: 32px; height: 32px; }
+    .hero .eyebrow { font-size: 0.95rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #f59e0b; margin-bottom: 0.75rem; }
     .nav-links { display: flex; flex-wrap: wrap; gap: 0.45rem 1rem; align-items: center; }
     .nav-links a { color: rgba(255,255,255,0.85); text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
     .nav-links a:hover { color: #fff; }
@@ -84,11 +87,8 @@
 
 <nav>
   <div class="nav-brand">
-    <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="32" height="32" rx="8" fill="#f59e0b"/>
-      <path d="M16 6L4 14v14h8v-8h8v8h8V14L16 6z" fill="white"/>
-    </svg>
-    Real Estate AI
+    <img src="/assets/favicon.svg" alt="" width="32" height="32" />
+    KeyProse
   </div>
   <div class="nav-links">
     <a href="/tools/listing">Listings</a>
@@ -102,7 +102,8 @@
 </nav>
 
 <section class="hero">
-  <h1>AI-Powered Tools for<br>Real Estate Professionals</h1>
+  <p class="eyebrow">KeyProse</p>
+  <h1>The AI back office for listing agents</h1>
   <p>Generate MLS listings, CMA reports, social posts, and email campaigns in seconds — not hours.</p>
   <div class="hero-cta">
     <a href="/tools/listing" class="btn btn-primary">🏡 Try Listing Writer</a>
@@ -124,7 +125,7 @@
     <label class="toggle"><input type="checkbox" checked disabled><span class="slider"></span></label>
   </div>
 
-  <h2 class="section-title">Your Complete Real Estate AI Toolkit</h2>
+  <h2 class="section-title">Your Complete KeyProse Toolkit</h2>
   <p class="section-sub">Everything you need to automate your marketing and close more deals.</p>
 
   <div class="tools-grid">
@@ -188,7 +189,7 @@
 </div>
 
 <footer>
-  <p>Real Estate AI Business-in-a-Box &mdash; <a href="/docs">API Docs</a> &middot; <a href="https://github.com/K-Love/listing-pilot" target="_blank" rel="noopener">GitHub</a></p>
+  <p>KeyProse &mdash; <a href="/docs">API Docs</a> &middot; <a href="https://github.com/K-Love/listing-pilot" target="_blank" rel="noopener">GitHub</a></p>
   <p style="margin-top:0.5rem; font-size:0.8rem;">Demo software for review. No customer list or revenue is represented here. Built with FastAPI.</p>
 </footer>
 </body>

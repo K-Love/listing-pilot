@@ -1,4 +1,4 @@
-# Demo Script — Real Estate AI Business-in-a-Box
+# Demo Script — KeyProse
 
 **Total demo time:** ~8 minutes  
 **Audience:** Potential buyers, investors, real estate agents  
@@ -30,7 +30,7 @@ curl http://localhost:8000/api/health
 
 ### [0:00] Opening — Landing Page
 
-> *"This is Real Estate AI Business-in-a-Box — a complete SaaS toolkit for real estate professionals. Let me show you what it does."*
+> *"This is KeyProse: the AI back office for listing agents. Let me show you what it does."*
 
 - Show the landing page at `http://localhost:8000`
 - Point out the 5 tools in the grid

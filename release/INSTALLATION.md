@@ -71,10 +71,10 @@ CMD ["python", "backend/server.py"]
 EOF
 
 # Build and run
-docker build -t listing-pilot .
+docker build -t keyprose .
 docker run -p 8000:8000 \
   -e OPENAI_API_KEY=sk-your-key \
-  listing-pilot
+  keyprose
 ```
 
 ### Railway (Recommended)
@@ -102,7 +102,7 @@ web: python backend/server.py
 
 ```bash
 # Install flyctl: https://fly.io/docs/hands-on/install-flyctl/
-fly launch --name listing-pilot
+fly launch --name keyprose
 fly secrets set OPENAI_API_KEY=sk-your-key
 fly deploy
 ```

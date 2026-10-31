@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# run_demo.sh — Start the Real Estate AI demo server
+# run_demo.sh — Start the KeyProse demo server
 # Usage: bash scripts/run_demo.sh
 
 set -e
@@ -7,7 +7,7 @@ set -e
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
 
-echo "🏠 Real Estate AI — Business-in-a-Box"
+echo "KeyProse: the AI back office for listing agents"
 echo "======================================"
 echo ""
 

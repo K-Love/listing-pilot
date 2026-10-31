@@ -1,6 +1,6 @@
 # Transfer Instructions
 
-This document outlines the steps to transfer the **Real Estate AI Business-in-a-Box** codebase to the buyer.
+This document outlines the steps to transfer the **KeyProse** codebase to the buyer. The GitHub repository is still named `listing-pilot`.
 
 ---
 

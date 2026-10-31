@@ -1,6 +1,10 @@
-# Real Estate AI — Business-in-a-Box
+# KeyProse
 
-> **5 AI-powered tools for real estate professionals.** Generate MLS listings, CMA reports, social posts, email campaigns, and outreach sequences — in seconds, not hours.
+> **KeyProse: the AI back office for listing agents.** 5 AI-powered tools for real estate professionals. Generate MLS listings, CMA reports, social posts, email campaigns, and outreach sequences — in seconds, not hours.
+
+The Git repository is still named `listing-pilot`. API routes and environment variables are unchanged.
+
+Planned domains, not registered and not configured in this app: `keyprose.com` and `keyprose.app`. There is no canonical URL setting. After one is purchased, point it at the host and set CORS `allow_origins` in `backend/server.py`. Do not hardcode the domain.
 
 [![CI](https://github.com/YOUR_USERNAME/listing-pilot/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_USERNAME/listing-pilot/actions)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://python.org)
@@ -99,8 +103,8 @@ CMD ["python", "backend/server.py"]
 
 ```bash
 # Build and run
-docker build -t listing-pilot .
-docker run -p 8000:8000 -e OPENAI_API_KEY=sk-... listing-pilot
+docker build -t keyprose .
+docker run -p 8000:8000 -e OPENAI_API_KEY=sk-... keyprose
 ```
 
 ---
